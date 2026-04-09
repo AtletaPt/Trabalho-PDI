@@ -7,12 +7,16 @@
     <h1>Cabazes Disponíveis</h1>
 
     {% for cabaz in cabazes %}
-        <div style="border:1px solid black; margin:10px; padding:10px;">
-            <h2>{{ cabaz.get_name_display }}</h2>
-            <p>{{ cabaz.description }}</p>
-            <p><strong>Preço:</strong> {{ cabaz.price }}€</p>
-        </div>
-    {% endfor %}
+    <div style="border:1px solid black; margin:10px; padding:10px;">
+        <h2>{{ cabaz.get_name_display }}</h2>
+        <p>{{ cabaz.description }}</p>
+        <p><strong>Preço:</strong> {{ cabaz.price }}€</p>
+
+        <a href="/orders/encomendar/{{ cabaz.id }}/">
+    <button>Encomendar</button>
+</a>
+    </div>
+{% endfor %}
 
 </body>
 </html>
