@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Encomenda Confirmada</title>
+</head>
+<body>
+    <h1 style="color: green;">✔ Encomenda Realizada com Sucesso!</h1>
+    
+    <h3>Detalhes da Entrega:</h3>
+    <ul>
+        <li><strong>Cabaz:</strong> {{ order.cabaz.get_name_display }}</li>
+        <li><strong>Quantidade:</strong> {{ order.quantity }}</li>
+        <li><strong>Data:</strong> {{ order.delivery_date }}</li>
+        <li><strong>Zona:</strong> {{ order.zone.name }}</li>
+    </ul>
+
+    <h3>Logística Atribuída:</h3>
+    <p><strong>Motorista:</strong> {{ order.driver.name|default:"A designar" }}</p>
+    <p><strong>Veículo:</strong> {{ order.vehicle.name|default:"A designar" }} ({{ order.vehicle.license_plate }})</p>
+
+    <br>
+    <a href="/">Voltar à Página Inicial</a>
+</body>
+</html>

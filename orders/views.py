@@ -2,77 +2,132 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from datetime import datetime
 from django.contrib import messages
+
 from cabazes.models import Cabaz
 from .models import Order
 from users.models import CustomUser
 from logistics.models import Zone, Vehicle, Driver 
 
+def obter_zona_por_cp(zip_code):
+    """
+    Lógica baseada na lista detalhada da ANACOM fornecida pelo utilizador.
+    Verifica se o CP de 7 dígitos pertence a uma das zonas de Coimbra.
+    """
+    try:
+        # Tenta dividir o CP (ex: 3000-005 -> 3000 e 005)
+        prefixo, sufixo = zip_code.split('-')
+        sufixo = int(sufixo)
+    except:
+        return None
 
-# Página de encomenda (MOSTRAR FORMULÁRIO)
+    # 1. Santo António dos Olivais e Celas
+    if prefixo == '3000':
+        if sufixo == 5 or (25 <= sufixo <= 46) or sufixo == 48 or sufixo == 101 or sufixo == 119 or \
+           (291 <= sufixo <= 293) or sufixo == 299 or sufixo == 304 or sufixo == 313 or sufixo == 353 or \
+           (375 <= sufixo <= 377) or (458 <= sufixo <= 459) or sufixo == 538 or sufixo == 540 or (542 <= sufixo <= 543):
+            return "Santo António dos Olivais e Celas"
+    elif prefixo == '3020':
+        if sufixo == 134 or (163 <= sufixo <= 165) or (238 <= sufixo <= 239) or sufixo == 246 or \
+           (249 <= sufixo <= 250) or sufixo == 255 or (368 <= sufixo <= 369) or sufixo == 371 or sufixo == 385 or \
+           (476 <= sufixo <= 489):
+            return "Santo António dos Olivais e Celas"
+    elif prefixo == '3030':
+        if sufixo in [461, 464, 468, 471, 473] or (477 <= sufixo <= 491) or sufixo == 493 or (775 <= sufixo <= 776):
+            return "Santo António dos Olivais e Celas"
+
+    # 2. Coimbra Centro (Baixa e Sé)
+    if prefixo == '3000':
+        if (20 <= sufixo <= 34) or (97 <= sufixo <= 104) or (114 <= sufixo <= 116) or (120 <= sufixo <= 122) or \
+           (282 <= sufixo <= 290) or (294 <= sufixo <= 312) or (315 <= sufixo <= 317) or sufixo == 351 or \
+           (355 <= sufixo <= 363) or (365 <= sufixo <= 366) or sufixo in [368, 370] or (372 <= sufixo <= 374) or \
+           sufixo == 470 or (472 <= sufixo <= 473) or (475 <= sufixo <= 476) or sufixo in [481, 484] or \
+           (486 <= sufixo <= 487) or (489 <= sufixo <= 492) or sufixo == 494 or sufixo == 503 or \
+           (507 <= sufixo <= 509) or sufixo == 511 or (515 <= sufixo <= 516) or sufixo == 520 or (522 <= sufixo <= 525):
+            return "Coimbra Centro (Baixa e Sé)"
+
+    # 3. Solum e Vale das Flores
+    if prefixo == '3030':
+        if sufixo == 450 or (452 <= sufixo <= 459):
+            return "Solum e Vale das Flores"
+
+    # 4. Eiras e São Paulo de Frades
+    if prefixo == '3000' and (106 <= sufixo <= 113):
+        return "Eiras e São Paulo de Frades"
+    elif prefixo == '3020':
+        if (130 <= sufixo <= 133) or (135 <= sufixo <= 136) or sufixo == 154 or sufixo == 164 or \
+           (166 <= sufixo <= 171) or sufixo in [239, 240, 248, 251, 308, 384, 438, 458, 478, 497] or \
+           (242 <= sufixo <= 244) or (253 <= sufixo <= 254) or (322 <= sufixo <= 324) or \
+           (422 <= sufixo <= 424) or (428 <= sufixo <= 430) or (461 <= sufixo <= 462) or (499 <= sufixo <= 500):
+            return "Eiras e São Paulo de Frades"
+
+    # 5. São Martinho e Santa Clara
+    if prefixo == '3045':
+        if (1 <= sufixo <= 199) or (300 <= sufixo <= 999):
+            return "São Martinho e Santa Clara"
+
+    return None
+
 def pagina_encomenda(request, cabaz_id):
     cabaz = get_object_or_404(Cabaz, id=cabaz_id)
     hoje = timezone.now().date()
+    return render(request, 'orders/encomenda.html', {'cabaz': cabaz, 'hoje': hoje})
 
-    return render(request, 'orders/encomenda.html', {
-        'cabaz': cabaz,
-        'hoje': hoje
-    })
-
-
-# Confirmar encomenda (CRIAR REGISTO COM LOGÍSTICA AUTOMÁTICA)
 def confirmar_encomenda(request, cabaz_id):
     cabaz = get_object_or_404(Cabaz, id=cabaz_id)
 
     if request.method == 'POST':
-        # usar o primeiro utilizador disponível
         customer = CustomUser.objects.first()
-        
         quantity = int(request.POST.get('quantity', 1))
         delivery_date_str = request.POST.get('delivery_date')
+        zip_code = request.POST.get('zip_code', '') 
 
-        # Validação da data
+        # 1. VALIDAÇÃO DE DATA (Formato e se é futura)
         try:
+            # Converte a string do formulário para objeto date
             delivery_date = datetime.strptime(delivery_date_str, "%Y-%m-%d").date()
         except (ValueError, TypeError):
-            messages.error(request, "Data de entrega inválida.")
+            messages.error(request, "Data inválida ou não preenchida.")
             return redirect(f'/orders/encomendar/{cabaz.id}/')
 
+        # Bloqueia datas passadas (compara com a data de hoje)
         hoje = timezone.now().date()
-
-        # BLOQUEAR datas passadas
         if delivery_date < hoje:
-            messages.error(request, "Não pode escolher uma data que já passou.")
+            messages.error(request, "Erro: Não é possível realizar encomendas para datas passadas.")
             return redirect(f'/orders/encomendar/{cabaz.id}/')
 
-        # BLOQUEAR dias que não sejam Segunda(0), Quarta(2) ou Sexta(4)
+        # Bloqueia dias que não sejam Segunda(0), Quarta(2) ou Sexta(4)
         if delivery_date.weekday() not in [0, 2, 4]:
-            messages.error(request, "Entregas disponíveis apenas à Segunda, Quarta e Sexta.")
+            messages.error(request, "Dias de entrega disponíveis: Apenas Segunda, Quarta e Sexta.")
             return redirect(f'/orders/encomendar/{cabaz.id}/')
-        
-        # Tentar obter a primeira zona registada no sistema
-        zona_atribuida = Zone.objects.first()
-        
-        # obter o veículo que pertence a essa zona
-        veiculo_atribuido = None
-        if zona_atribuida:
-            veiculo_atribuido = Vehicle.objects.filter(zone=zona_atribuida).first()
-        
-        # obter o primeiro motorista registado
+
+        # 2. VALIDAÇÃO DE CÓDIGO POSTAL
+        nome_zona = obter_zona_por_cp(zip_code)
+        if not nome_zona:
+            messages.error(request, f"O Código Postal {zip_code} não é coberto pelas nossas entregas em Coimbra.")
+            return redirect(f'/orders/encomendar/{cabaz.id}/')
+
+        # 3. BUSCA DE DADOS NO ADMIN
+        zona_atribuida = Zone.objects.filter(name__iexact=nome_zona).first()
+        if not zona_atribuida:
+            messages.error(request, f"Erro de configuração: Zona '{nome_zona}' não encontrada no sistema.")
+            return redirect(f'/orders/encomendar/{cabaz.id}/')
+
+        veiculo_atribuido = Vehicle.objects.filter(zone=zona_atribuida).first()
         motorista_atribuido = Driver.objects.first()
 
-        # --- Criação da Encomenda ---
-        Order.objects.create(
+        # 4. CRIAÇÃO DA ENCOMENDA
+        nova_encomenda = Order.objects.create(
             customer=customer,
             cabaz=cabaz,
             quantity=quantity,
             delivery_date=delivery_date,
             status='pendente',
-            zone=zona_atribuida,          
-            vehicle=veiculo_atribuido,    
-            driver=motorista_atribuido     
+            zone=zona_atribuida,
+            vehicle=veiculo_atribuido,
+            driver=motorista_atribuido
         )
 
-        messages.success(request, f"Encomenda de {cabaz.get_name_display()} realizada com sucesso!")
-        return redirect('/')
+        messages.success(request, "Encomenda registada com sucesso!")
+        return render(request, 'orders/sucesso.html', {'order': nova_encomenda})
 
     return redirect('/cabazes/')
