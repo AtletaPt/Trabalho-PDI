@@ -2,31 +2,47 @@
 <html>
 <head>
     <title>Confirmar Encomenda</title>
+    <style>
+        .messages { margin-bottom: 20px; list-style: none; padding: 0; }
+        .message { padding: 10px; border-radius: 4px; margin-bottom: 5px; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    </style>
 </head>
 <body>
 
     <h1>Confirmar Encomenda</h1>
 
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="message {{ message.tags }}">
+            {{ message }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     <h2>{{ cabaz.get_name_display }}</h2>
     <p>{{ cabaz.description }}</p>
     <p><strong>Preço:</strong> {{ cabaz.price }}€</p>
 
-    {% comment %} variável de hoje {% endcomment %}
     <form method="POST" action="/orders/confirmar/{{ cabaz.id }}/">
-    {% csrf_token %}
+        {% csrf_token %}
 
-    <label>Quantidade:</label>
-    <input type="number" name="quantity" value="1" min="1">
+        <label>Quantidade:</label>
+        <input type="number" name="quantity" value="1" min="1">
 
-    <br><br>
+        <br><br>
 
-    <label>Data de entrega:</label>
-    <input type="date" name="delivery_date" min="{{ hoje }}">
+        <label>Data de entrega:</label>
+        <input type="date" name="delivery_date" min="{{ hoje }}" required>
+        <small>(Segundas, Quartas e Sextas)</small>
 
-    <br><br>
+        <br><br>
 
-    <button type="submit">Confirmar Encomenda</button>
-</form>
+        <button type="submit">Confirmar Encomenda</button>
+    </form>
 
     <br>
     <a href="/cabazes/">Voltar</a>
