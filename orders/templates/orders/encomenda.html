@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirmar Encomenda</title>
+</head>
+<body>
+
+    <h1>Confirmar Encomenda</h1>
+
+    <h2>{{ cabaz.get_name_display }}</h2>
+    <p>{{ cabaz.description }}</p>
+    <p><strong>Preço:</strong> {{ cabaz.price }}€</p>
+
+    {% comment %} variável de hoje {% endcomment %}
+    <form method="POST" action="/orders/confirmar/{{ cabaz.id }}/">
+    {% csrf_token %}
+
+    <label>Quantidade:</label>
+    <input type="number" name="quantity" value="1" min="1">
+
+    <br><br>
+
+    <label>Data de entrega:</label>
+    <input type="date" name="delivery_date" min="{{ hoje }}">
+
+    <br><br>
+
+    <button type="submit">Confirmar Encomenda</button>
+</form>
+
+    <br>
+    <a href="/cabazes/">Voltar</a>
+
+</body>
+</html>
