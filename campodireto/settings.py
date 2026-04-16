@@ -109,9 +109,13 @@ USE_TZ = True
 
 
 
+# Ficheiros Estáticos (CSS, JavaScript, Imagens de Design como o Logo)
 STATIC_URL = 'static/'
-# Configuração para ficheiros de média (Uploads)
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# Ficheiros de Média (Uploads de utilizadores, como as fotos dos cabazes)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Modelo de Utilizador Personalizado
 AUTH_USER_MODEL = 'users.CustomUser'
