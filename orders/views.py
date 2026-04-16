@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from datetime import datetime
 from django.contrib import messages
+from django.db import transaction
 
 from cabazes.models import Cabaz
 from .models import Order
@@ -9,12 +10,7 @@ from users.models import CustomUser
 from logistics.models import Zone, Vehicle, Driver 
 
 def obter_zona_por_cp(zip_code):
-    """
-    Lógica baseada na lista detalhada da ANACOM fornecida pelo utilizador.
-    Verifica se o CP de 7 dígitos pertence a uma das zonas de Coimbra.
-    """
     try:
-        # Tenta dividir o CP (ex: 3000-005 -> 3000 e 005)
         prefixo, sufixo = zip_code.split('-')
         sufixo = int(sufixo)
     except:
@@ -77,57 +73,65 @@ def confirmar_encomenda(request, cabaz_id):
 
     if request.method == 'POST':
         customer = CustomUser.objects.first()
-        quantity = int(request.POST.get('quantity', 1))
+        quantity_ordered = int(request.POST.get('quantity', 1)) 
         delivery_date_str = request.POST.get('delivery_date')
         zip_code = request.POST.get('zip_code', '') 
 
-        # 1. VALIDAÇÃO DE DATA (Formato e se é futura)
+        # 1. VALIDAÇÕES DE DATA E CP
         try:
-            # Converte a string do formulário para objeto date
             delivery_date = datetime.strptime(delivery_date_str, "%Y-%m-%d").date()
         except (ValueError, TypeError):
-            messages.error(request, "Data inválida ou não preenchida.")
+            messages.error(request, "Data inválida.")
             return redirect(f'/orders/encomendar/{cabaz.id}/')
 
-        # Bloqueia datas passadas (compara com a data de hoje)
         hoje = timezone.now().date()
         if delivery_date < hoje:
-            messages.error(request, "Erro: Não é possível realizar encomendas para datas passadas.")
+            messages.error(request, "Não pode encomendar para datas passadas.")
             return redirect(f'/orders/encomendar/{cabaz.id}/')
 
-        # Bloqueia dias que não sejam Segunda(0), Quarta(2) ou Sexta(4)
         if delivery_date.weekday() not in [0, 2, 4]:
-            messages.error(request, "Dias de entrega disponíveis: Apenas Segunda, Quarta e Sexta.")
+            messages.error(request, "Entregas apenas à Segunda, Quarta e Sexta.")
             return redirect(f'/orders/encomendar/{cabaz.id}/')
 
-        # 2. VALIDAÇÃO DE CÓDIGO POSTAL
         nome_zona = obter_zona_por_cp(zip_code)
         if not nome_zona:
-            messages.error(request, f"O Código Postal {zip_code} não é coberto pelas nossas entregas em Coimbra.")
+            messages.error(request, f"O Código Postal {zip_code} não é coberto pelas nossas entregas.")
             return redirect(f'/orders/encomendar/{cabaz.id}/')
 
-        # 3. BUSCA DE DADOS NO ADMIN
-        zona_atribuida = Zone.objects.filter(name__iexact=nome_zona).first()
-        if not zona_atribuida:
-            messages.error(request, f"Erro de configuração: Zona '{nome_zona}' não encontrada no sistema.")
-            return redirect(f'/orders/encomendar/{cabaz.id}/')
+        # 2. VERIFICAÇÃO PREVENTIVA DE STOCK
+        # Usamos atomic() para garantir que nada é gravado se houver erro a meio
+        with transaction.atomic():
+            # Percorremos os itens do cabaz (ex: 2kg de Batata)
+            for item in cabaz.items.all(): 
+                necessario = item.quantity * quantity_ordered
+                if item.product.stock < necessario:
+                    messages.error(request, f"Stock insuficiente: {item.product.name} (Só temos {item.product.stock}).")
+                    return redirect(f'/orders/encomendar/{cabaz.id}/')
 
-        veiculo_atribuido = Vehicle.objects.filter(zone=zona_atribuida).first()
-        motorista_atribuido = Driver.objects.first()
+            # 3. LOGÍSTICA
+            zona_atribuida = Zone.objects.filter(name__iexact=nome_zona).first()
+            veiculo_atribuido = Vehicle.objects.filter(zone=zona_atribuida).first()
+            motorista_atribuido = Driver.objects.first()
 
-        # 4. CRIAÇÃO DA ENCOMENDA
-        nova_encomenda = Order.objects.create(
-            customer=customer,
-            cabaz=cabaz,
-            quantity=quantity,
-            delivery_date=delivery_date,
-            status='pendente',
-            zone=zona_atribuida,
-            vehicle=veiculo_atribuido,
-            driver=motorista_atribuido
-        )
+            # 4. CRIAR ENCOMENDA
+            nova_encomenda = Order.objects.create(
+                customer=customer,
+                cabaz=cabaz,
+                quantity=quantity_ordered,
+                delivery_date=delivery_date,
+                status='pendente',
+                zone=zona_atribuida,
+                vehicle=veiculo_atribuido,
+                driver=motorista_atribuido
+            )
 
-        messages.success(request, "Encomenda registada com sucesso!")
+            # 5. EXECUTAR BAIXA DE STOCK REAL
+            for item in cabaz.items.all():
+                necessario = item.quantity * quantity_ordered
+                item.product.stock -= necessario
+                item.product.save()
+
+        messages.success(request, "Encomenda confirmada e inventário atualizado!")
         return render(request, 'orders/sucesso.html', {'order': nova_encomenda})
 
     return redirect('/cabazes/')
