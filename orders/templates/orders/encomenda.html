@@ -1,56 +1,62 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Confirmar Encomenda</title>
-    <style>
-        .messages { list-style: none; padding: 0; margin-bottom: 20px; }
-        .message { padding: 10px; border-radius: 4px; margin-bottom: 5px; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-    <h1>Confirmar Encomenda</h1>
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 style="color: #1a3317;">Finalizar a sua Encomenda</h1>
+        <p style="color: #666;">Por favor, confirme os detalhes de entrega para o <strong>{{ cabaz.get_name_display }}</strong>.</p>
+    </div>
 
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li class="message {{ message.tags }}">
-            {{ message }}
-        </li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        
+        <div style="border-right: 1px solid #eee; padding-right: 40px;">
+            <h3 style="color: #2d5a27; margin-top: 0;">Resumo</h3>
+            {% if cabaz.image %}
+                <img src="{{ cabaz.image.url }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 20px;">
+            {% endif %}
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Preço Unitário:</span>
+                <strong>{{ cabaz.price }}€</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>Peso Aprox:</span>
+                <strong>{{ cabaz.weight }}kg</strong>
+            </div>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="font-size: 0.9rem; color: #777;">{{ cabaz.description }}</p>
+        </div>
 
-    <h2>{{ cabaz.get_name_display }}</h2>
-    <p>{{ cabaz.description }}</p>
-    <p><strong>Preço:</strong> {{ cabaz.price }}€</p>
+        <div>
+            <form method="POST" action="{% url 'confirmar_encomenda' cabaz.id %}">
+                {% csrf_token %}
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Quantidade de Cabazes</label>
+                    <input type="number" name="quantity" value="1" min="1" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+                </div>
 
-    <form method="POST" action="/orders/confirmar/{{ cabaz.id }}/">
-        {% csrf_token %}
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Data de Entrega</label>
+                    <input type="date" name="delivery_date" min="{{ hoje|date:'Y-m-d' }}" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+                    <small style="color: #888;">Entregas às 2ª, 4ª e 6ª feiras.</small>
+                </div>
 
-        <label>Quantidade:</label>
-        <input type="number" name="quantity" value="1" min="1">
+                <div style="margin-bottom: 30px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Código Postal (Coimbra)</label>
+                    <input type="text" name="zip_code" placeholder="3000-000" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+                </div>
 
-        <br><br>
+                {% if messages %}
+                    {% for message in messages %}
+                        <div style="padding: 10px; margin-bottom: 20px; border-radius: 8px; background: #ffebee; color: #c62828; font-size: 0.9rem;">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
 
-        <label>Código Postal (Coimbra):</label><br>
-        <input type="text" name="zip_code" placeholder="Ex: 3040-000" pattern="\d{4}-\d{3}" title="Formato: 0000-000" required>
-        <br><small>Introduza o CP para calcularmos a zona de entrega.</small>
-
-        <br><br>
-
-        <label>Data de entrega:</label>
-        <input type="date" name="delivery_date" min="{{ hoje }}" required>
-
-        <br><br>
-
-        <button type="submit">Confirmar Encomenda</button>
-    </form>
-
-    <br>
-    <a href="/cabazes/">Voltar</a>
-
-</body>
-</html>
+                <button type="submit" class="btn" style="width: 100%; font-size: 1.1rem;">Confirmar e Pagar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
