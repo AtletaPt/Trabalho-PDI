@@ -1,40 +1,28 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div style="text-align: center; margin-bottom: 50px;">
-    <h1 style="font-size: 2.8rem; color: #1a3317; font-weight: 700; margin-bottom: 10px;">Os Nossos Cabazes Frescos</h1>
-    <p style="color: #555; font-size: 1.1rem;">Produtos da época, colhidos à mão em Coimbra.</p>
+    <h1 style="font-size: 2.5rem; color: #2d5a27;">Escolha o seu Cabaz</h1>
 </div>
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 35px;">
     {% for cabaz in cabazes %}
-    <div style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08); transition: transform 0.3s ease; border: 1px solid #eee;">
+    <div style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #eee;">
         
-        <div style="height: 230px; background: #f0f0f0; overflow: hidden;">
+        <div style="height: 230px; background: #f0f0f0;">
             {% if cabaz.image %}
                 <img src="{{ cabaz.image.url }}" style="width: 100%; height: 100%; object-fit: cover;">
             {% else %}
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #999;">
-                    <span style="font-size: 2rem;">🧺</span>
-                    <span style="font-size: 0.8rem; margin-top: 10px;">Sem fotografia disponível</span>
-                </div>
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;">Sem foto</div>
             {% endif %}
         </div>
         
-        <div style="padding: 30px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0; color: #2d5a27; font-size: 1.5rem;">{{ cabaz.get_name_display }}</h3>
-                <span style="background: #e8f5e9; color: #2d5a27; padding: 5px 15px; border-radius: 30px; font-size: 0.85rem; font-weight: 600;">
-                    {{ cabaz.weight }}kg
-                </span>
-            </div>
-            
-            <p style="color: #666; font-size: 0.95rem; line-height: 1.6; height: 75px; overflow: hidden; margin-bottom: 25px;">
-                {{ cabaz.description }}
-            </p>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 20px; border-top: 1px solid #f0f0f0;">
-                <span style="font-size: 1.8rem; font-weight: 700; color: #1a3317;">{{ cabaz.price }}€</span>
+        <div style="padding: 25px;">
+            <h3 style="margin: 0; color: #2d5a27;">{{ cabaz.get_name_display }} ({{ cabaz.weight }}kg)</h3>
+            <p style="color: #666; font-size: 0.9rem; margin: 15px 0;">{{ cabaz.description }}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 15px;">
+                <span style="font-size: 1.5rem; font-weight: 700;">{{ cabaz.price }}€</span>
                 <a href="/orders/encomendar/{{ cabaz.id }}/" class="btn">Encomendar</a>
             </div>
         </div>

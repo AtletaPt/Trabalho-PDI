@@ -1,94 +1,60 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CampoDireto | Do Campo para a sua Mesa</title>
+    <title>CampoDireto | Coimbra</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2d5a27; /* Verde Natureza */
-            --secondary: #f4f4f4;
-            --accent: #ff9800; /* Laranja Cenoura */
-            --text: #333;
+            --primary: #2d5a27;
+            --accent: #ff9800;
+            --bg: #f8fbf8;
         }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            background-color: #fff;
-            color: var(--text);
-            line-height: 1.6;
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: #333; }
+        
+        /* Navbar com Logo */
+        nav { 
+            background: white; /* Mudamos para branco para o logo destacar melhor */
+            padding: 0.5rem 8%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            border-bottom: 3px solid var(--primary);
         }
+        .logo-img { height: 70px; width: auto; transition: 0.3s; }
+        .logo-img:hover { transform: scale(1.05); }
 
-        /* Navbar Elegante */
-        nav {
-            background: var(--primary);
-            padding: 1rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+        .nav-links a { color: var(--primary); text-decoration: none; margin-left: 25px; font-weight: 600; }
+        .nav-links a:hover { color: var(--accent); }
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            margin-left: 20px;
-        }
+        .container { max-width: 1100px; margin: 40px auto; padding: 20px; min-height: 80vh; }
 
-        .logo { font-size: 1.5rem; font-weight: 700; color: white; }
+        .btn { background: var(--accent); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; border: none; cursor: pointer; }
+        .btn:hover { background: #e68a00; transform: translateY(-2px); }
 
-        /* Content Area */
-        .container {
-            padding: 40px 5%;
-            max-width: 1200px;
-            margin: auto;
-        }
-
-        /* Botões Profissionais */
-        .btn {
-            background: var(--accent);
-            color: white;
-            padding: 10px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            display: inline-block;
-            transition: transform 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn:hover { transform: scale(1.05); }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: #f9f9f9;
-            margin-top: 50px;
-        }
+        footer { text-align: center; padding: 40px; background: white; border-top: 1px solid #eee; margin-top: 50px; color: #888; }
     </style>
 </head>
 <body>
-
     <nav>
-        <div class="logo">🌿 CampoDireto</div>
-        <div>
-            <a href="/">Início</a>
+        <a href="/">
+            <img src="{% static 'images/logo.png' %}" alt="CampoDireto" class="logo-img">
+        </a>
+        <div class="nav-links">
             <a href="/cabazes/">Cabazes</a>
-            <a href="/orders/historico/">As Minhas Encomendas</a>
+            <a href="/orders/historico/">Minhas Encomendas</a>
         </div>
     </nav>
 
     <div class="container">
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </div>
 
     <footer>
-        &copy; 2026 CampoDireto - Coimbra. Todos os direitos reservados.
+        &copy; 2026 CampoDireto Coimbra - Apoie o comércio local.
     </footer>
-
 </body>
 </html>

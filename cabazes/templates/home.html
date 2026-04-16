@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div style="
-    background: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.2)), url('https://images.unsplash.com/photo-1495539406979-bf61750d38ad?q=80&w=2070&auto=format&fit=crop');
+    background: linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)), url('https://images.unsplash.com/photo-1495539406979-bf61750d38ad?q=80&w=2070&auto=format&fit=crop');
     background-size: cover;
     background-position: center;
     height: 450px;
@@ -12,52 +13,18 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     margin-bottom: 60px;
-    padding: 0 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 ">
-    <h1 style="font-size: 3.2rem; color: #1a3317; font-weight: 700; margin-bottom: 15px; text-shadow: 1px 1px 3px rgba(255,255,255,0.5);">
-        Frescura do Campo em sua Casa
-    </h1>
-    <p style="font-size: 1.25rem; color: #2d5a27; font-weight: 500; max-width: 650px; margin-bottom: 35px; line-height: 1.4;">
-        Apoie os produtores locais de Coimbra e receba cabazes sazonais com o melhor que a terra tem para dar.
-    </p>
-    <a href="/cabazes/" class="btn" style="padding: 16px 45px; font-size: 1.1rem; box-shadow: 0 8px 20px rgba(255,152,0,0.3);">
-        Ver Cabazes Disponíveis
-    </a>
+    <img src="{% static 'images/logo.png' %}" style="height: 120px; margin-bottom: 20px;">
+    <h1 style="font-size: 3rem; color: #1a3317; margin: 0;">Frescura à sua porta</h1>
+    <p style="font-size: 1.2rem; color: #2d5a27; font-weight: 500; margin-bottom: 30px;">Cabazes sazonais dos produtores de Coimbra.</p>
+    <a href="/cabazes/" class="btn">Encomendar Cabaz</a>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; padding: 0 20px;">
-    
-    <div style="text-align: center; padding: 20px;">
-        <div style="background: #e8f5e9; width: 70px; height: 70px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; transform: rotate(-5deg);">
-            <span style="font-size: 2rem;">🌿</span>
-        </div>
-        <h3 style="color: #1a3317; margin-bottom: 10px;">100% Biológico</h3>
-        <p style="color: #666; font-size: 0.95rem;">Produtos cultivados com respeito pela natureza e sem químicos agressivos.</p>
-    </div>
-
-    <div style="text-align: center; padding: 20px;">
-        <div style="background: #fff3e0; width: 70px; height: 70px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; transform: rotate(5deg);">
-            <span style="font-size: 2rem;">🚚</span>
-        </div>
-        <h3 style="color: #1a3317; margin-bottom: 10px;">Entrega Local</h3>
-        <p style="color: #666; font-size: 0.95rem;">Logística otimizada para Coimbra: entregas rápidas às 2ª, 4ª e 6ª feiras.</p>
-    </div>
-
-    <div style="text-align: center; padding: 20px;">
-        <div style="background: #e1f5fe; width: 70px; height: 70px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; transform: rotate(-5deg);">
-            <span style="font-size: 2rem;">🤝</span>
-        </div>
-        <h3 style="color: #1a3317; margin-bottom: 10px;">Preço Justo</h3>
-        <p style="color: #666; font-size: 0.95rem;">Eliminamos intermediários para que o produtor ganhe mais e o cliente pague menos.</p>
-    </div>
-
-</div>
-
-<div style="background: #f0f7f0; border-radius: 20px; padding: 40px; margin-top: 60px; text-align: center; border: 1px dashed #2d5a27;">
-    <h2 style="color: #2d5a27; margin-bottom: 10px;">Pronto para mudar a sua alimentação?</h2>
-    <p style="color: #555; margin-bottom: 25px;">Junte-se a dezenas de famílias em Coimbra que já consomem local.</p>
-    <a href="/users/registo/" style="color: #2d5a27; font-weight: 600; text-decoration: underline;">Crie a sua conta hoje →</a>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; text-align: center;">
+    <div><h3>🌿 Sustentável</h3><p>Direto do produtor.</p></div>
+    <div><h3>🚚 Rápido</h3><p>Entrega em 24h/48h.</p></div>
+    <div><h3>💰 Justo</h3><p>Preço sem intermediários.</p></div>
 </div>
 {% endblock %}

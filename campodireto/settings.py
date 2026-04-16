@@ -109,13 +109,16 @@ USE_TZ = True
 
 
 
-# Ficheiros Estáticos (CSS, JavaScript, Imagens de Design como o Logo)
+# Ficheiros Estáticos (Design)
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# Ficheiros de Média (Uploads de utilizadores, como as fotos dos cabazes)
+# Ficheiros de Média (Uploads dos Cabazes)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Modelo de Utilizador Personalizado
+# Modelo de Utilizador
 AUTH_USER_MODEL = 'users.CustomUser'
+
+# Configuração de IDs automáticos (padrão do Django)
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
