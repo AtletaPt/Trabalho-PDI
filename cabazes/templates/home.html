@@ -2,6 +2,23 @@
 {% load static %}
 
 {% block content %}
+
+{% if messages %}
+    <div style="margin: 20px auto; max-width: 1200px;">
+        {% for message in messages %}
+            {% if message.tags == 'error' %}
+                <div style="padding: 15px; border-radius: 15px; margin-bottom: 15px; font-weight: 500; text-align: center; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;">
+                    {{ message }}
+                </div>
+            {% else %}
+                <div style="padding: 15px; border-radius: 15px; margin-bottom: 15px; font-weight: 500; text-align: center; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+
 <div style="
     background: linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)), url('https://images.unsplash.com/photo-1495539406979-bf61750d38ad?q=80&w=2070&auto=format&fit=crop');
     background-size: cover;
@@ -19,7 +36,7 @@
     <img src="{% static 'images/logo.png' %}" style="height: 120px; margin-bottom: 20px;">
     <h1 style="font-size: 3rem; color: #1a3317; margin: 0;">Frescura à sua porta</h1>
     <p style="font-size: 1.2rem; color: #2d5a27; font-weight: 500; margin-bottom: 30px;">Cabazes sazonais dos produtores de Coimbra.</p>
-    <a href="/cabazes/" class="btn">Encomendar Cabaz</a>
+    <a href="/cabazes/" class="btn" style="padding: 15px 30px; background-color: #2d5a27; color: white; text-decoration: none; border-radius: 10px; font-weight: bold;">Encomendar Cabaz</a>
 </div>
 
 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; text-align: center;">
@@ -27,4 +44,5 @@
     <div><h3>🚚 Rápido</h3><p>Entrega em 24h/48h.</p></div>
     <div><h3>💰 Justo</h3><p>Preço sem intermediários.</p></div>
 </div>
+
 {% endblock %}
