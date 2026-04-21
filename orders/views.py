@@ -3,6 +3,7 @@ from django.utils import timezone
 from datetime import datetime
 from django.contrib import messages
 from django.db import transaction
+from django.contrib.auth.decorators import login_required # Adicionado para segurança
 
 from cabazes.models import Cabaz
 from .models import Order
@@ -68,11 +69,13 @@ def pagina_encomenda(request, cabaz_id):
     hoje = timezone.now().date()
     return render(request, 'orders/encomenda.html', {'cabaz': cabaz, 'hoje': hoje})
 
+@login_required # Garante que só quem está logado encomenda
 def confirmar_encomenda(request, cabaz_id):
     cabaz = get_object_or_404(Cabaz, id=cabaz_id)
 
     if request.method == 'POST':
-        customer = CustomUser.objects.first()
+        # ALTERADO: Agora usa o utilizador que está logado (request.user)
+        customer = request.user 
         quantity_ordered = int(request.POST.get('quantity', 1)) 
         delivery_date_str = request.POST.get('delivery_date')
         zip_code = request.POST.get('zip_code', '') 
@@ -99,9 +102,7 @@ def confirmar_encomenda(request, cabaz_id):
             return redirect(f'/orders/encomendar/{cabaz.id}/')
 
         # 2. VERIFICAÇÃO PREVENTIVA DE STOCK
-        # Usamos atomic() para garantir que nada é gravado se houver erro a meio
         with transaction.atomic():
-            # Percorremos os itens do cabaz (ex: 2kg de Batata)
             for item in cabaz.items.all(): 
                 necessario = item.quantity * quantity_ordered
                 if item.product.stock < necessario:
@@ -115,14 +116,15 @@ def confirmar_encomenda(request, cabaz_id):
 
             # 4. CRIAR ENCOMENDA
             nova_encomenda = Order.objects.create(
-                customer=customer,
+                user=customer, # Certifica-te que o campo no teu Model Order se chama 'user' ou 'customer'
                 cabaz=cabaz,
                 quantity=quantity_ordered,
                 delivery_date=delivery_date,
                 status='pendente',
                 zone=zona_atribuida,
                 vehicle=veiculo_atribuido,
-                driver=motorista_atribuido
+                driver=motorista_atribuido,
+                zip_code=zip_code # Adicionado para guardar o CP
             )
 
             # 5. EXECUTAR BAIXA DE STOCK REAL
@@ -135,3 +137,9 @@ def confirmar_encomenda(request, cabaz_id):
         return render(request, 'orders/sucesso.html', {'order': nova_encomenda})
 
     return redirect('/cabazes/')
+
+# NOVA FUNÇÃO
+@login_required
+def historico_encomendas(request):
+    encomendas = Order.objects.filter(customer=request.user).order_by('-delivery_date')
+    return render(request, 'orders/historico.html', {'encomendas': encomendas})

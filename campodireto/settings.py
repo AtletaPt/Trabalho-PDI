@@ -122,3 +122,8 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 # Configuração de IDs automáticos (padrão do Django)
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Redirecionamento após Login/Logout
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = 'login'

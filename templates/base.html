@@ -14,9 +14,8 @@
         }
         body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: #333; }
         
-        /* Navbar com Logo */
         nav { 
-            background: white; /* Mudamos para branco para o logo destacar melhor */
+            background: white; 
             padding: 0.5rem 8%; 
             display: flex; 
             justify-content: space-between; 
@@ -24,28 +23,46 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
             border-bottom: 3px solid var(--primary);
         }
-        .logo-img { height: 70px; width: auto; transition: 0.3s; }
-        .logo-img:hover { transform: scale(1.05); }
 
-        .nav-links a { color: var(--primary); text-decoration: none; margin-left: 25px; font-weight: 600; }
+        .brand-container { display: flex; align-items: center; text-decoration: none; }
+        .logo-img { height: 70px; width: auto; transition: 0.3s; }
+        .brand-name { font-size: 1.8rem; font-weight: 700; color: var(--primary); margin-left: 15px; letter-spacing: -1px; }
+
+        .nav-links { display: flex; align-items: center; }
+        .nav-links a { color: var(--primary); text-decoration: none; margin-left: 20px; font-weight: 600; font-size: 0.95rem; }
         .nav-links a:hover { color: var(--accent); }
 
-        .container { max-width: 1100px; margin: 40px auto; padding: 20px; min-height: 80vh; }
+        .btn-logout { background: none; border: 1px solid #ffcdd2; color: #d32f2f; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-left: 15px; transition: 0.2s; }
+        .btn-logout:hover { background: #ffebee; }
 
-        .btn { background: var(--accent); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; border: none; cursor: pointer; }
-        .btn:hover { background: #e68a00; transform: translateY(-2px); }
+        .container { max-width: 1100px; margin: 40px auto; padding: 20px; min-height: 80vh; }
+        .btn { background: var(--accent); color: white; padding: 10px 22px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; border: none; cursor: pointer; }
+        .btn:hover { background: #e68a00; transform: translateY(-1px); }
 
         footer { text-align: center; padding: 40px; background: white; border-top: 1px solid #eee; margin-top: 50px; color: #888; }
     </style>
 </head>
 <body>
     <nav>
-        <a href="/">
+        <a href="/" class="brand-container">
             <img src="{% static 'images/logo.png' %}" alt="CampoDireto" class="logo-img">
+            <span class="brand-name">CampoDireto</span>
         </a>
+
         <div class="nav-links">
             <a href="/cabazes/">Cabazes</a>
-            <a href="/orders/historico/">Minhas Encomendas</a>
+            
+            {% if user.is_authenticated %}
+                <a href="/orders/historico/">Minhas Encomendas</a>
+                <span style="margin-left: 20px; color: #666; font-size: 0.85rem;">Olá, <strong>{{ user.username }}</strong></span>
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-logout">Sair</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">Entrar</a>
+                <a href="/users/registo/" class="btn">Criar Conta</a>
+            {% endif %}
         </div>
     </nav>
 
@@ -54,7 +71,7 @@
     </div>
 
     <footer>
-        &copy; 2026 CampoDireto Coimbra - Apoie o comércio local.
+        &copy; 2026 CampoDireto Coimbra - Do produtor para a sua mesa.
     </footer>
 </body>
 </html>
