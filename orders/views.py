@@ -143,3 +143,98 @@ def confirmar_encomenda(request, cabaz_id):
 def historico_encomendas(request):
     encomendas = Order.objects.filter(customer=request.user).order_by('-delivery_date')
     return render(request, 'orders/historico.html', {'encomendas': encomendas})
+# orders/views.py (Adicionar ao fim)
+
+def adicionar_ao_carrinho(request, cabaz_id):
+    if 'carrinho' not in request.session:
+        request.session['carrinho'] = {}
+    
+    carrinho = request.session['carrinho']
+    id_str = str(cabaz_id)
+    carrinho[id_str] = carrinho.get(id_str, 0) + 1
+    
+    request.session.modified = True
+    messages.success(request, "Cabaz adicionado ao carrinho!")
+    return redirect('/cabazes/')
+
+def ver_carrinho(request):
+    carrinho_sessao = request.session.get('carrinho', {})
+    itens_display = []
+    total_geral = 0
+    
+    for cabaz_id, qtd in carrinho_sessao.items():
+        cabaz = get_object_or_404(Cabaz, id=int(cabaz_id))
+        subtotal = cabaz.price * qtd
+        total_geral += subtotal
+        itens_display.append({'cabaz': cabaz, 'quantidade': qtd, 'subtotal': subtotal})
+
+    return render(request, 'orders/carrinho.html', {
+        'itens': itens_display,
+        'total': total_geral,
+        'hoje': timezone.now().date()
+    })
+
+@login_required
+@transaction.atomic
+def finalizar_carrinho(request):
+    if request.method == 'POST':
+        carrinho = request.session.get('carrinho', {})
+        if not carrinho: 
+            return redirect('/cabazes/')
+
+        zip_code = request.POST.get('zip_code')
+        delivery_date_str = request.POST.get('delivery_date')
+
+        # 1. Validação de Zona e Logística
+        nome_zona = obter_zona_por_cp(zip_code)
+        if not nome_zona:
+            messages.error(request, "Zona não coberta.")
+            return redirect('/orders/carrinho/')
+
+        zona = Zone.objects.filter(name__iexact=nome_zona).first()
+        veiculo = Vehicle.objects.filter(zone=zona).first()
+        motorista = Driver.objects.first()
+
+        try:
+            # 2. Primeiro verificamos se HÁ STOCK para tudo no carrinho
+            # Fazemos isto antes de começar a descontar para não dar erro a meio
+            for cabaz_id, qtd_encomendada in carrinho.items():
+                cabaz_obj = Cabaz.objects.get(id=int(cabaz_id))
+                
+                for item in cabaz_obj.items.all():  # Aceder aos produtos dentro do cabaz
+                    total_necessario = item.quantity * qtd_encomendada
+                    if item.product.stock < total_necessario:
+                        messages.error(request, f"Stock insuficiente de {item.product.name}. Necessário: {total_necessario}kg, Disponível: {item.product.stock}kg.")
+                        return redirect('/orders/carrinho/')
+
+            # 3. Se o stock chegar para tudo, então agora criamos as encomendas e descontamos
+            for cabaz_id, qtd_encomendada in carrinho.items():
+                cabaz_obj = Cabaz.objects.get(id=int(cabaz_id))
+                
+                # Descontar stock de cada produto individualmente
+                for item in cabaz_obj.items.all():
+                    item.product.stock -= (item.quantity * qtd_encomendada)
+                    item.product.save()
+
+                # Criar a Encomenda (Order)
+                Order.objects.create(
+                    customer=request.user, 
+                    cabaz=cabaz_obj,
+                    quantity=qtd_encomendada,
+                    delivery_date=datetime.strptime(delivery_date_str, "%Y-%m-%d").date(),
+                    zone=zona,
+                    vehicle=veiculo,
+                    driver=motorista,
+                    status='pendente'
+                )
+
+            # 4. Limpeza
+            del request.session['carrinho']
+            messages.success(request, "Encomenda confirmada! O inventário de cada produto foi atualizado.")
+            return redirect('/orders/historico/')
+
+        except Exception as e:
+            messages.error(request, f"Erro ao processar: {str(e)}")
+            return redirect('/orders/carrinho/')
+
+    return redirect('/orders/carrinho/')

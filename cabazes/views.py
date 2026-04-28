@@ -5,5 +5,6 @@ def home(request):
     return render(request, 'home.html')
 
 def lista_cabazes(request):
-    cabazes = Cabaz.objects.all()
+    # O nome correto aqui é 'products', que é o que está no teu models.py
+    cabazes = Cabaz.objects.all().prefetch_related('products')
     return render(request, 'cabazes/lista.html', {'cabazes': cabazes})

@@ -2,6 +2,13 @@
 {% load static %}
 
 {% block content %}
+
+<div style="text-align: right; margin-bottom: 30px;">
+    <a href="{% url 'ver_carrinho' %}" style="display: inline-block; background: #e8f0e7; color: #2d5a27; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: bold; border: 1px solid #2d5a27;">
+        🛒 Ver Carrinho ({{ request.session.carrinho|length }})
+    </a>
+</div>
+
 <div style="text-align: center; margin-bottom: 50px;">
     <h1 style="font-size: 2.5rem; color: #2d5a27;">Escolha o seu Cabaz</h1>
 </div>
@@ -21,9 +28,25 @@
         <div style="padding: 25px;">
             <h3 style="margin: 0; color: #2d5a27;">{{ cabaz.get_name_display }} ({{ cabaz.weight }}kg)</h3>
             <p style="color: #666; font-size: 0.9rem; margin: 15px 0;">{{ cabaz.description }}</p>
+
+            <div style="background: #f9f9f9; border-radius: 10px; padding: 12px; margin-bottom: 15px; border: 1px dashed #2d5a27;">
+                <p style="margin: 0 0 5px 0; font-size: 0.8rem; font-weight: bold; color: #2d5a27; text-transform: uppercase;">Inclui neste cabaz:</p>
+                <ul style="margin: 0; padding: 0 0 0 15px; font-size: 0.85rem; color: #444;">
+                    {% for produto in cabaz.products.all %}
+                        <li>• {{ produto.name }}</li>
+                    {% empty %}
+                        <li>Produtos sazonais variados</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 15px;">
                 <span style="font-size: 1.5rem; font-weight: 700;">{{ cabaz.price }}€</span>
-                <a href="/orders/encomendar/{{ cabaz.id }}/" class="btn">Encomendar</a>
+                
+                <a href="{% url 'adicionar_ao_carrinho' cabaz.id %}" 
+                   style="background: #2d5a27; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">
+                   + Carrinho
+                </a>
             </div>
         </div>
     </div>
