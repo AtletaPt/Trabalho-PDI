@@ -33,7 +33,7 @@
                 <p style="margin: 0 0 5px 0; font-size: 0.8rem; font-weight: bold; color: #2d5a27; text-transform: uppercase;">Inclui neste cabaz:</p>
                 <ul style="margin: 0; padding: 0 0 0 15px; font-size: 0.85rem; color: #444;">
                     {% for produto in cabaz.products.all %}
-                        <li>• {{ produto.name }}</li>
+                        <li> {{ produto.name }}</li>
                     {% empty %}
                         <li>Produtos sazonais variados</li>
                     {% endfor %}
