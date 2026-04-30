@@ -4,7 +4,7 @@
 <div style="max-width: 800px; margin: 0 auto;">
     <div style="text-align: center; margin-bottom: 40px;">
         <h1 style="color: #1a3317;">Finalizar a sua Encomenda</h1>
-        <p style="color: #666;">Por favor, confirme os detalhes de entrega para o <strong>{{ cabaz.get_name_display }}</strong>.</p>
+        <p style="color: #666;">Confirme os detalhes de entrega para o <strong>{{ cabaz.get_name_display }}</strong>.</p>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
@@ -45,14 +45,6 @@
                     <label style="display: block; margin-bottom: 8px; font-weight: 600;">Código Postal (Coimbra)</label>
                     <input type="text" name="zip_code" placeholder="3000-000" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
                 </div>
-
-                {% if messages %}
-                    {% for message in messages %}
-                        <div style="padding: 10px; margin-bottom: 20px; border-radius: 8px; background: #ffebee; color: #c62828; font-size: 0.9rem;">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
 
                 <button type="submit" class="btn" style="width: 100%; font-size: 1.1rem;">Confirmar e Pagar</button>
             </form>
