@@ -16,6 +16,7 @@
                     <th style="padding: 15px; text-align: center;">Quantidade</th>
                     <th style="padding: 15px; text-align: right;">Preço Unitário</th>
                     <th style="padding: 15px; text-align: right;">Subtotal</th>
+                    <th style="padding: 15px; text-align: center;">Ação</th>
                 </tr>
             </thead>
             <tbody>
@@ -33,6 +34,12 @@
                     <td style="padding: 15px; text-align: right; font-weight: bold; color: #2d5a27;">
                         {{ item.subtotal }}€
                     </td>
+                    <td style="padding: 15px; text-align: center;">
+                        <a href="{% url 'remover_do_carrinho' item.cabaz.id %}" 
+                           style="color: #c62828; text-decoration: none; font-size: 0.9rem; background: #fee; padding: 5px 10px; border-radius: 5px; border: 1px solid #fcc;">
+                           Eliminar
+                        </a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -42,6 +49,7 @@
                     <td style="padding: 20px; text-align: right; font-size: 1.4rem; font-weight: bold; color: #2d5a27;">
                         {{ total }}€
                     </td>
+                    <td></td>
                 </tr>
             </tfoot>
         </table>

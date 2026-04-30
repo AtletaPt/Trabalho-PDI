@@ -233,3 +233,13 @@ def finalizar_carrinho(request):
             return redirect('/orders/carrinho/')
 
     return redirect('/orders/carrinho/')
+def remover_do_carrinho(request, cabaz_id):
+    carrinho = request.session.get('carrinho', {})
+    id_str = str(cabaz_id)
+    
+    if id_str in carrinho:
+        del carrinho[id_str]
+        request.session.modified = True
+        messages.success(request, "Item removido com sucesso.")
+    
+    return redirect('ver_carrinho')
