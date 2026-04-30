@@ -1,33 +1,98 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div
+  style="
+    max-width: 450px;
+    margin: 40px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    border: 1px solid #eee;
+  "
+>
+  <img
+    src="{% static 'images/logo.png' %}"
+    style="height: 100px; margin-bottom: 20px"
+  />
+  <h2 style="color: #1a3317; margin-bottom: 10px">Bem-vindo de volta</h2>
+  <p style="color: #666; margin-bottom: 30px">
+    Entre para gerir as suas encomendas
+  </p>
 
-{% block content %}
-<div style="max-width: 450px; margin: 40px auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); text-align: center; border: 1px solid #eee;">
-    <img src="{% static 'images/logo.png' %}" style="height: 100px; margin-bottom: 20px;">
-    <h2 style="color: #1a3317; margin-bottom: 10px;">Bem-vindo de volta</h2>
-    <p style="color: #666; margin-bottom: 30px;">Entre para gerir as suas encomendas</p>
+  <form method="post">
+    {% csrf_token %}
 
-    <form method="post">
-        {% csrf_token %}
-        
-        <div style="text-align: left; margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #444;">Nome de Utilizador</label>
-            <input type="text" name="username" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
-        </div>
-
-        <div style="text-align: left; margin-bottom: 30px;">
-            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #444;">Palavra-passe</label>
-            <input type="password" name="password" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; box-sizing: border-box;">
-        </div>
-
-        <button type="submit" class="btn" style="width: 100%; padding: 14px; font-size: 1.1rem;">Iniciar Sessão</button>
-    </form>
-
-    <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
-        <p style="color: #777; font-size: 0.9rem;">
-            Ainda não tem conta no CampoDireto? <br>
-            <a href="/users/registo/" style="color: var(--primary); font-weight: 700; text-decoration: none;">Registe-se agora</a>
-        </p>
+    <div style="text-align: left; margin-bottom: 20px">
+      <label
+        style="
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 600;
+          color: #444;
+        "
+        >Nome de Utilizador</label
+      >
+      <input
+        type="text"
+        name="username"
+        required
+        style="
+          width: 100%;
+          padding: 12px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          font-size: 1rem;
+          box-sizing: border-box;
+        "
+      />
     </div>
+
+    <div style="text-align: left; margin-bottom: 30px">
+      <label
+        style="
+          display: block;
+          margin-bottom: 8px;
+          font-weight: 600;
+          color: #444;
+        "
+        >Palavra-passe</label
+      >
+      <input
+        type="password"
+        name="password"
+        required
+        style="
+          width: 100%;
+          padding: 12px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          font-size: 1rem;
+          box-sizing: border-box;
+        "
+      />
+    </div>
+
+    <button
+      type="submit"
+      class="btn"
+      style="width: 100%; padding: 14px; font-size: 1.1rem"
+    >
+      Iniciar Sessão
+    </button>
+  </form>
+
+  <div
+    style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #f0f0f0"
+  >
+    <p style="color: #777; font-size: 0.9rem">
+      Ainda não tem conta no CampoDireto? <br />
+      <a
+        href="/users/registo/"
+        style="color: var(--primary); font-weight: 700; text-decoration: none"
+        >Registe-se agora</a
+      >
+    </p>
+  </div>
 </div>
 {% endblock %}

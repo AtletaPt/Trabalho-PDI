@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.home, name='home'),              # página inicial
-    path('cabazes/', views.lista_cabazes, name='lista_cabazes'),  # lista de cabazes
+    path(
+        "", views.lista_cabazes, name="lista_cabazes"
+    ),  # Agora será acessível em /cabazes/
+    path("<int:cabaz_id>/", views.detalhe_cabaz, name="detalhe_cabaz"),
 ]

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 900px; margin: 40px auto; padding: 20px; font-family: sans-serif;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+        
+        <div>
+            {% if cabaz.image %}
+                <img src="{{ cabaz.image.url }}" style="width: 100%; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+            {% endif %}
+        </div>
+
+        <div>
+            <h1 style="color: #1a3317; margin-bottom: 10px;">{{ cabaz.get_name_display }}</h1>
+            <p style="font-size: 1.2rem; color: #2d5a27; font-weight: bold;">{{ cabaz.price }}€ | {{ cabaz.weight }}kg</p>
+            <p style="color: #555; line-height: 1.6;">{{ cabaz.description }}</p>
+
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
+
+            <h3 style="color: #1a3317;">Escolha o que incluir:</h3>
+            <p style="font-size: 0.85rem; color: #888;">* Desmarque os itens que não deseja receber.</p>
+
+            <form action="{% url 'adicionar_ao_carrinho' cabaz.id %}" method="POST" id="form-cabaz">
+                {% csrf_token %}
+                <div style="margin-bottom: 25px;">
+                    {% for produto in cabaz.products.all %}
+                    <label style="display: block; padding: 10px; border-bottom: 1px solid #f9f9f9; cursor: pointer;">
+                        <input type="checkbox" name="produtos_escolhidos" value="{{ produto.name }}" checked 
+                               style="margin-right: 10px; accent-color: #2d5a27;">
+                        {{ produto.name }}
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" style="width: 100%; background: #2d5a27; color: white; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">
+                    Adicionar ao Carrinho
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Validação para garantir que pelo menos um item está selecionado
+    document.getElementById('form-cabaz').onsubmit = function(e) {
+        const checkboxes = document.querySelectorAll('input[name="produtos_escolhidos"]:checked');
+        if (checkboxes.length === 0) {
+            e.preventDefault();
+            alert("Por favor, selecione pelo menos um item para o seu cabaz!");
+        }
+    };
+</script>
+{% endblock %}

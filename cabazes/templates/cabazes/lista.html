@@ -15,41 +15,38 @@
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 35px;">
     {% for cabaz in cabazes %}
-    <div style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #eee;">
+    <div style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); transition: 0.3s; display: flex; flex-direction: column; height: 100%;">
+    
+    <div style="height: 250px; overflow: hidden;">
+        {% if cabaz.image %}
+            <img src="{{ cabaz.image.url }}" style="width: 100%; height: 100%; object-fit: cover;">
+        {% endif %}
+    </div>
+
+    <div style="padding: 25px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between;">
         
-        <div style="height: 230px; background: #f0f0f0;">
-            {% if cabaz.image %}
-                <img src="{{ cabaz.image.url }}" style="width: 100%; height: 100%; object-fit: cover;">
-            {% else %}
-                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;">Sem foto</div>
-            {% endif %}
+        <div>
+            <h2 style="color: #1a3317; margin: 0 0 10px 0; font-size: 1.4rem;">
+                {{ cabaz.get_name_display }} ({{ cabaz.weight }}kg)
+            </h2>
+            
+            <p style="color: #666; line-height: 1.5; font-size: 0.95rem; margin-bottom: 20px;">
+                {{ cabaz.description|truncatewords:20 }}
+            </p>
         </div>
-        
-        <div style="padding: 25px;">
-            <h3 style="margin: 0; color: #2d5a27;">{{ cabaz.get_name_display }} ({{ cabaz.weight }}kg)</h3>
-            <p style="color: #666; font-size: 0.9rem; margin: 15px 0;">{{ cabaz.description }}</p>
 
-            <div style="background: #f9f9f9; border-radius: 10px; padding: 12px; margin-bottom: 15px; border: 1px dashed #2d5a27;">
-                <p style="margin: 0 0 5px 0; font-size: 0.8rem; font-weight: bold; color: #2d5a27; text-transform: uppercase;">Inclui neste cabaz:</p>
-                <ul style="margin: 0; padding: 0 0 0 15px; font-size: 0.85rem; color: #444;">
-                    {% for produto in cabaz.products.all %}
-                        <li> {{ produto.name }}</li>
-                    {% empty %}
-                        <li>Produtos sazonais variados</li>
-                    {% endfor %}
-                </ul>
+        <div>
+            <div style="font-size: 1.6rem; font-weight: bold; color: #2d5a27; margin-bottom: 15px;">
+                {{ cabaz.price }}€
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 15px;">
-                <span style="font-size: 1.5rem; font-weight: 700;">{{ cabaz.price }}€</span>
-                
-                <a href="{% url 'adicionar_ao_carrinho' cabaz.id %}" 
-                   style="background: #2d5a27; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">
-                   + Carrinho
-                </a>
-            </div>
+            <a href="{% url 'detalhe_cabaz' cabaz.id %}" 
+               style="display: block; text-align: center; background: #2d5a27; color: white; padding: 14px; text-decoration: none; border-radius: 12px; font-weight: bold; transition: 0.2s; border: 2px solid #2d5a27;">
+               Ver Opções e Comprar
+            </a>
         </div>
     </div>
+</div>
     {% endfor %}
 </div>
 {% endblock %}

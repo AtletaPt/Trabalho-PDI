@@ -1,9 +1,9 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block content %}
-<div style="
-    background: linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)), url('https://images.unsplash.com/photo-1495539406979-bf61750d38ad?q=80&w=2070&auto=format&fit=crop');
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div
+  style="
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)),
+      url(&quot;https://images.unsplash.com/photo-1495539406979-bf61750d38ad?q=80&w=2070&auto=format&fit=crop&quot;);
     background-size: cover;
     background-position: center;
     height: 450px;
@@ -14,18 +14,61 @@
     align-items: center;
     text-align: center;
     margin-bottom: 60px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-">
-    <img src="{% static 'images/logo.png' %}" style="height: 120px; margin-bottom: 20px;">
-    <h1 style="font-size: 3rem; color: #1a3317; margin: 0;">Frescura à sua porta</h1>
-    <p style="font-size: 1.2rem; color: #2d5a27; font-weight: 500; margin-bottom: 30px;">Cabazes sazonais dos produtores de Coimbra.</p>
-    
-    <a href="/cabazes/" class="btn" style="padding: 15px 30px; background-color: #2d5a27; color: white; text-decoration: none; border-radius: 10px; font-weight: bold;">Escolher o meu Cabaz</a>
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  "
+>
+  <img
+    src="{% static 'images/logo.png' %}"
+    style="height: 120px; margin-bottom: 20px"
+  />
+  <h1 style="font-size: 3rem; color: #1a3317; margin: 0">
+    Frescura à sua porta
+  </h1>
+  <p
+    style="
+      font-size: 1.2rem;
+      color: #2d5a27;
+      font-weight: 500;
+      margin-bottom: 30px;
+    "
+  >
+    Cabazes sazonais dos produtores de Coimbra.
+  </p>
+
+  <a
+    href="/cabazes/"
+    class="btn"
+    style="
+      padding: 15px 30px;
+      background-color: #2d5a27;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: bold;
+    "
+    >Escolher o meu Cabaz</a
+  >
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; text-align: center;">
-    <div><h3>🌿 Sustentável</h3><p>Direto do produtor.</p></div>
-    <div><h3>🚚 Rápido</h3><p>Entrega em 24h/48h.</p></div>
-    <div><h3>💰 Justo</h3><p>Preço sem intermediários.</p></div>
+<div
+  style="
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    text-align: center;
+  "
+>
+  <div>
+    <h3>🌿 Sustentável</h3>
+    <p>Direto do produtor.</p>
+  </div>
+  <div>
+    <h3>🚚 Rápido</h3>
+    <p>Entrega em 24h/48h.</p>
+  </div>
+  <div>
+    <h3>💰 Justo</h3>
+    <p>Preço sem intermediários.</p>
+  </div>
 </div>
 {% endblock %}

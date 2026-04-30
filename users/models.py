@@ -3,13 +3,14 @@ from django.db import models
 
 # Tipos de utilizador
 USER_TYPES = (
-    ('client', 'Cliente'),
-    ('producer', 'Produtor'),
-    ('admin', 'Administrador'),
+    ("client", "Cliente"),
+    ("producer", "Produtor"),
+    ("admin", "Administrador"),
 )
 
+
 class CustomUser(AbstractUser):
-    user_type = models.CharField(max_length=10, choices=USER_TYPES, default='client')
+    user_type = models.CharField(max_length=10, choices=USER_TYPES, default="client")
 
     # Campos adicionais do produtor
     company_name = models.CharField(max_length=100, blank=True, null=True)

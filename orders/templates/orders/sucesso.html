@@ -1,22 +1,47 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
+<div
+  style="
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    text-align: center;
+  "
+>
+  <div style="font-size: 4rem; color: #4caf50; margin-bottom: 20px">✓</div>
+  <h1 style="margin-bottom: 10px">Encomenda Confirmada!</h1>
+  <p style="color: #666; margin-bottom: 30px">
+    Obrigado por apoiar a produção local de Coimbra.
+  </p>
 
-{% block content %}
-<div style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center;">
-    <div style="font-size: 4rem; color: #4caf50; margin-bottom: 20px;">✓</div>
-    <h1 style="margin-bottom: 10px;">Encomenda Confirmada!</h1>
-    <p style="color: #666; margin-bottom: 30px;">Obrigado por apoiar a produção local de Coimbra.</p>
+  <div
+    style="
+      background: #f9f9f9;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: left;
+      margin-bottom: 30px;
+      border-left: 5px solid var(--primary);
+    "
+  >
+    <h3 style="margin-top: 0; color: var(--primary)">📍 Detalhes da Entrega</h3>
+    <p>
+      <strong>Data:</strong> {{ order.delivery_date|date:"d/m/Y" }} ({{
+      order.delivery_date|date:"l" }})
+    </p>
+    <p><strong>Zona:</strong> {{ order.zone.name }}</p>
+    <p>
+      <strong>Transporte:</strong> {{ order.vehicle.vehicle_type }} ({{
+      order.vehicle.license_plate }})
+    </p>
+    <p><strong>Motorista:</strong> {{ order.driver.name }}</p>
+  </div>
 
-    <div style="background: #f9f9f9; padding: 25px; border-radius: 12px; text-align: left; margin-bottom: 30px; border-left: 5px solid var(--primary);">
-        <h3 style="margin-top: 0; color: var(--primary);">📍 Detalhes da Entrega</h3>
-        <p><strong>Data:</strong> {{ order.delivery_date|date:"d/m/Y" }} ({{ order.delivery_date|date:"l" }})</p>
-        <p><strong>Zona:</strong> {{ order.zone.name }}</p>
-        <p><strong>Transporte:</strong> {{ order.vehicle.vehicle_type }} ({{ order.vehicle.license_plate }})</p>
-        <p><strong>Motorista:</strong> {{ order.driver.name }}</p>
-    </div>
-
-    <div style="display: flex; gap: 15px; justify-content: center;">
-        <a href="/cabazes/" class="btn" style="background: #333;">Voltar à Loja</a>
-        <a href="/orders/historico/" class="btn">Ver Minhas Encomendas</a>
-    </div>
+  <div style="display: flex; gap: 15px; justify-content: center">
+    <a href="/cabazes/" class="btn" style="background: #333">Voltar à Loja</a>
+    <a href="/orders/historico/" class="btn">Ver Minhas Encomendas</a>
+  </div>
 </div>
 {% endblock %}

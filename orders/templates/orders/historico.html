@@ -1,64 +1,112 @@
-{% extends 'base.html' %}
-
-{% block content %}
-<div style="margin-bottom: 40px;">
-    <h1 style="color: #1a3317; margin-bottom: 10px;">As Minhas Encomendas</h1>
-    <p style="color: #666;">Consulte o histórico das suas compras e o estado das entregas.</p>
+{% extends 'base.html' %} {% block content %}
+<div style="margin-bottom: 40px">
+  <h1 style="color: #1a3317; margin-bottom: 10px">As Minhas Encomendas</h1>
+  <p style="color: #666">
+    Consulte o histórico das suas compras e o estado das entregas.
+  </p>
 </div>
 
 {% if encomendas %}
-    <div style="background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee;">
-        <table style="width: 100%; border-collapse: collapse; text-align: left;">
-            <thead>
-                <tr style="background: #f0f7f0; color: #2d5a27;">
-                    <th style="padding: 20px;">Cabaz</th>
-                    <th style="padding: 20px;">Data de Entrega</th>
-                    <th style="padding: 20px;">Morada / CP</th>
-                    <th style="padding: 20px;">Veículo de Entrega</th>
-                    <th style="padding: 20px;">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in encomendas %}
-                <tr style="border-bottom: 1px solid #eee; transition: 0.2s;" onmouseover="this.style.background='#fcfdfc'" onmouseout="this.style.background='transparent'">
-                    <td style="padding: 20px;">
-                        <strong style="color: #333;">{{ order.cabaz.get_name_display }}</strong>
-                    </td>
-                    <td style="padding: 20px;">
-                        <span style="background: #e1f5fe; color: #0288d1; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
-                            {{ order.delivery_date|date:"d/m/Y" }}
-                        </span>
-                    </td>
-                    <td style="padding: 20px; color: #666;">
-                        {{ order.zone.name }}<br>
-                        <small>{{ order.zip_code }}</small>
-                    </td>
-                    <td style="padding: 20px; color: #555;">
-                        <div style="margin-bottom: 4px;">
-                             <strong>{{ order.vehicle.vehicle_type }}</strong>
-                        </div>
-                        <div style="font-size: 0.85rem; color: #777;">
-                            Matrícula: <span style="font-family: monospace; background: #eee; padding: 2px 5px; border-radius: 4px;">{{ order.vehicle.license_plate }}</span>
-                         </div>
-                    </td>
-                    <td style="padding: 20px;">
-                        <strong style="font-size: 1.1rem; color: #1a3317;">{{ order.cabaz.price }}€</strong>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+<div
+  style="
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid #eee;
+  "
+>
+  <table style="width: 100%; border-collapse: collapse; text-align: left">
+    <thead>
+      <tr style="background: #f0f7f0; color: #2d5a27">
+        <th style="padding: 20px">Cabaz</th>
+        <th style="padding: 20px">Data de Entrega</th>
+        <th style="padding: 20px">Morada / CP</th>
+        <th style="padding: 20px">Veículo de Entrega</th>
+        <th style="padding: 20px">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in encomendas %}
+      <tr
+        style="border-bottom: 1px solid #eee; transition: 0.2s"
+        onmouseover="this.style.background = '#fcfdfc'"
+        onmouseout="this.style.background = 'transparent'"
+      >
+        <td style="padding: 20px">
+          <strong style="color: #333"
+            >{{ order.cabaz.get_name_display }}</strong
+          >
+        </td>
+        <td style="padding: 20px">
+          <span
+            style="
+              background: #e1f5fe;
+              color: #0288d1;
+              padding: 5px 12px;
+              border-radius: 20px;
+              font-size: 0.85rem;
+              font-weight: 600;
+            "
+          >
+            {{ order.delivery_date|date:"d/m/Y" }}
+          </span>
+        </td>
+        <td style="padding: 20px; color: #666">
+          {{ order.zone.name }}<br />
+          <small>{{ order.zip_code }}</small>
+        </td>
+        <td style="padding: 20px; color: #555">
+          <div style="margin-bottom: 4px">
+            <strong>{{ order.vehicle.vehicle_type }}</strong>
+          </div>
+          <div style="font-size: 0.85rem; color: #777">
+            Matrícula:
+            <span
+              style="
+                font-family: monospace;
+                background: #eee;
+                padding: 2px 5px;
+                border-radius: 4px;
+              "
+              >{{ order.vehicle.license_plate }}</span
+            >
+          </div>
+        </td>
+        <td style="padding: 20px">
+          <strong style="font-size: 1.1rem; color: #1a3317"
+            >{{ order.cabaz.price }}€</strong
+          >
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% else %}
-    <div style="text-align: center; padding: 60px; background: white; border-radius: 20px; border: 2px dashed #ddd;">
-        <div style="font-size: 4rem; margin-bottom: 20px;">📦</div>
-        <h3 style="color: #888;">Ainda não realizou nenhuma encomenda.</h3>
-        <p style="color: #aaa; margin-bottom: 25px;">Os seus produtos frescos de Coimbra estão à sua espera.</p>
-        <a href="/cabazes/" class="btn">Ver Cabazes Disponíveis</a>
-    </div>
+<div
+  style="
+    text-align: center;
+    padding: 60px;
+    background: white;
+    border-radius: 20px;
+    border: 2px dashed #ddd;
+  "
+>
+  <div style="font-size: 4rem; margin-bottom: 20px">📦</div>
+  <h3 style="color: #888">Ainda não realizou nenhuma encomenda.</h3>
+  <p style="color: #aaa; margin-bottom: 25px">
+    Os seus produtos frescos de Coimbra estão à sua espera.
+  </p>
+  <a href="/cabazes/" class="btn">Ver Cabazes Disponíveis</a>
+</div>
 {% endif %}
 
-<div style="margin-top: 30px;">
-    <a href="/" style="color: var(--primary); text-decoration: none; font-weight: 600;">← Voltar à página inicial</a>
+<div style="margin-top: 30px">
+  <a
+    href="/"
+    style="color: var(--primary); text-decoration: none; font-weight: 600"
+    >← Voltar à página inicial</a
+  >
 </div>
 {% endblock %}

@@ -1,35 +1,76 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
+<div
+  style="
+    max-width: 450px;
+    margin: 40px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    border: 1px solid #eee;
+  "
+>
+  <h2 style="color: #1a3317; margin-bottom: 10px">Criar Conta</h2>
+  <p style="color: #666; margin-bottom: 30px">
+    Junte-se à comunidade CampoDireto
+  </p>
 
-{% block content %}
-<div style="max-width: 450px; margin: 40px auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); text-align: center; border: 1px solid #eee;">
-    <h2 style="color: #1a3317; margin-bottom: 10px;">Criar Conta</h2>
-    <p style="color: #666; margin-bottom: 30px;">Junte-se à comunidade CampoDireto</p>
+  <form method="post">
+    {% csrf_token %}
 
-    <form method="post">
-        {% csrf_token %}
-        
-        <style>
-            /* Estilo para os campos do formulário padrão do Django */
-            form p { text-align: left; margin-bottom: 15px; }
-            form input { 
-                width: 100%; padding: 12px; border: 1px solid #ddd; 
-                border-radius: 8px; font-size: 1rem; box-sizing: border-box;
-                display: block; margin-top: 5px;
-            }
-            .helptext { font-size: 0.8rem; color: #888; display: block; margin-top: 5px; }
-            ul { font-size: 0.8rem; color: #888; text-align: left; padding-left: 20px; }
-        </style>
+    <style>
+      form p {
+        text-align: left;
+        margin-bottom: 15px;
+      }
+      form input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+        box-sizing: border-box;
+        display: block;
+        margin-top: 5px;
+      }
+      .helptext {
+        font-size: 0.8rem;
+        color: #888;
+        display: block;
+        margin-top: 5px;
+      }
+      ul {
+        font-size: 0.8rem;
+        color: #888;
+        text-align: left;
+        padding-left: 20px;
+      }
+    </style>
 
-        {{ form.as_p }}
+    {{ form.as_p }}
 
-        <button type="submit" class="btn" style="width: 100%; padding: 14px; font-size: 1.1rem; margin-top: 20px;">Registar</button>
-    </form>
+    <button
+      type="submit"
+      class="btn"
+      style="width: 100%; padding: 14px; font-size: 1.1rem; margin-top: 20px"
+    >
+      Registar
+    </button>
+  </form>
 
-    <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
-        <p style="color: #777; font-size: 0.9rem;">
-            Já tem uma conta? <br>
-            <a href="{% url 'login' %}" style="color: var(--primary); font-weight: 700; text-decoration: none;">Faça Login aqui</a>
-        </p>
-    </div>
+  <div
+    style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #f0f0f0"
+  >
+    <p style="color: #777; font-size: 0.9rem">
+      Já tem uma conta? <br />
+      <a
+        href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}"
+        style="color: var(--primary); font-weight: 700; text-decoration: none"
+      >
+        Faça Login aqui
+      </a>
+    </p>
+  </div>
 </div>
 {% endblock %}
