@@ -242,7 +242,7 @@ def adicionar_ao_carrinho(request, cabaz_id):
         else:
             carrinho[id_str] = {"quantidade": 1, "produtos": produtos_escolhidos}
 
-        messages.success(request, "Cabaz personalizado adicionado ao carrinho!")
+        messages.success(request, "Cabaz adicionado ao carrinho!")
     else:
         # Se for um GET simples (ex: botão + no carrinho), apenas aumenta a quantidade
         if id_str in carrinho:

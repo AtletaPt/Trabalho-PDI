@@ -174,27 +174,48 @@
     <div class="messages-container">
       {% if messages %} {% for message in messages %}
       <div
-        class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}"
+        style="
+          padding: 15px;
+          margin-bottom: 20px;
+          border: 1px solid transparent;
+          border-radius: 10px;
+          background-color: #dff0d8;
+          border-color: #d6e9c6;
+          color: #3c763d;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
       >
-        <span>
-          {% if message.tags == 'success' %}✅{% else %}⚠️{% endif %} {{ message
-          }}
-        </span>
+        <span> ✅ {{ message }} </span>
         <button
+          type="button"
           onclick="this.parentElement.style.display = 'none'"
           style="
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.2rem;
-            color: inherit;
-            opacity: 0.5;
+            color: #3c763d;
+            font-weight: bold;
           "
         >
           &times;
         </button>
       </div>
       {% endfor %} {% endif %}
+      <script>
+        // Procura todos os alertas e faz desaparecer após 5 segundos
+        setTimeout(function () {
+          let messages = document.querySelectorAll(
+            '[style*="background-color: #dff0d8"]',
+          );
+          messages.forEach((msg) => {
+            msg.style.transition = "opacity 0.5s ease";
+            msg.style.opacity = "0";
+            setTimeout(() => msg.remove(), 500);
+          });
+        }, 5000);
+      </script>
     </div>
 
     <div class="container">{% block content %}{% endblock %}</div>

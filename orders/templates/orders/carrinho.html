@@ -1,145 +1,63 @@
-{% extends 'base.html' %} {% load static %} {% block content %}
-<div style="max-width: 1000px; margin: 40px auto; padding: 20px">
-  <h1
-    style="
-      color: #1a3317;
-      border-bottom: 2px solid #2d5a27;
-      padding-bottom: 10px;
-      margin-bottom: 30px;
-    "
-  >
-    🛒 O Teu Carrinho
-  </h1>
+{% extends 'base.html' %}
+{% load static %}
 
-  {% if itens %}
-  <table
-    style="
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    "
-  >
-    <thead>
-      <tr style="background-color: #2d5a27; color: white; text-align: left">
-        <th style="padding: 15px">Cabaz Personalizado</th>
-        <th style="padding: 15px; text-align: center">Quantidade</th>
-        <th style="padding: 15px; text-align: right">Preço Unitário</th>
-        <th style="padding: 15px; text-align: right">Subtotal</th>
-        <th style="padding: 15px; text-align: center">Ação</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in itens %}
-      <tr style="border-bottom: 1px solid #eee">
-        <td style="padding: 15px; color: #1a3317">
-          <div style="font-weight: bold; font-size: 1.1rem">
-            {{ item.cabaz.get_name_display }}
-          </div>
-          <div
-            style="
-              font-size: 0.85rem;
-              color: #666;
-              margin-top: 8px;
-              background: #f9fdf9;
-              padding: 8px;
-              border-radius: 8px;
-              border: 1px solid #edf2ed;
-            "
-          >
-            <strong>Inclui:</strong> {{ item.produtos_selecionados|join:", " }}
-          </div>
+{% block content %}
+<div style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+    
+    <h1 style="color: #1a3317; border-bottom: 2px solid #2d5a27; padding-bottom: 10px; margin-bottom: 30px;">
+        🛒 O Teu Carrinho
+    </h1>
+
+    {% if itens %}
+        <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <thead>
+                <tr style="background-color: #2d5a27; color: white; text-align: left;">
+                    <th style="padding: 15px;">Cabaz</th> <th style="padding: 15px; text-align: center;">Quantidade</th>
+                    <th style="padding: 15px; text-align: right;">Preço Unitário</th>
+                    <th style="padding: 15px; text-align: right;">Subtotal</th>
+                    </tr>
+            </thead>
+            <tbody>
+    {% for item in itens %}
+    <tr style="border-bottom: 1px solid #eee;">
+        <td style="padding: 15px; color: #1a3317;">
+            <div style="font-weight: bold; font-size: 1.1rem;">
+                {{ item.cabaz.get_name_display }}
+            </div>
+            <div style="font-size: 0.85rem; color: #666; margin-top: 8px; background: #f9fdf9; padding: 8px; border-radius: 8px; border: 1px solid #edf2ed;">
+                <strong>Inclui:</strong> {{ item.produtos_selecionados|join:", " }}
+            </div>
+        </td>
+        
+        <td style="padding: 15px; text-align: center;">
+            <div style="display: inline-flex; align-items: center; gap: 15px; background: #f8f9f8; padding: 5px 15px; border-radius: 30px; border: 1px solid #eee;">
+                <a href="{% url 'remover_do_carrinho' item.cabaz.id %}" 
+                   style="text-decoration: none; color: #c62828; font-weight: bold; font-size: 1.2rem; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">-</a>
+                
+                <span style="font-weight: bold; font-size: 1.1rem; min-width: 20px;">{{ item.quantidade }}</span>
+                
+                <a href="{% url 'adicionar_ao_carrinho' item.cabaz.id %}" 
+                   style="text-decoration: none; color: #2d5a27; font-weight: bold; font-size: 1.2rem; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">+</a>
+            </div>
         </td>
 
-        <td style="padding: 15px; text-align: center">
-          <div
-            style="
-              display: inline-flex;
-              align-items: center;
-              gap: 15px;
-              background: #f8f9f8;
-              padding: 5px 15px;
-              border-radius: 30px;
-              border: 1px solid #eee;
-            "
-          >
-            <a
-              href="{% url 'remover_do_carrinho' item.cabaz.id %}"
-              style="
-                text-decoration: none;
-                color: #c62828;
-                font-weight: bold;
-                font-size: 1.2rem;
-                width: 25px;
-                height: 25px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: white;
-                border-radius: 50%;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-              "
-              >-</a
-            >
-
-            <span style="font-weight: bold; font-size: 1.1rem; min-width: 20px"
-              >{{ item.quantidade }}</span
-            >
-
-            <a
-              href="{% url 'adicionar_ao_carrinho' item.cabaz.id %}"
-              style="
-                text-decoration: none;
-                color: #2d5a27;
-                font-weight: bold;
-                font-size: 1.2rem;
-                width: 25px;
-                height: 25px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: white;
-                border-radius: 50%;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-              "
-              >+</a
-            >
-          </div>
+        <td style="padding: 15px; text-align: right;">
+            {{ item.cabaz.price }}€
         </td>
-
-        <td style="padding: 15px; text-align: right">
-          {{ item.cabaz.price }}€
+        <td style="padding: 15px; text-align: right; font-weight: bold; color: #2d5a27;">
+            {{ item.subtotal }}€
         </td>
-        <td
-          style="
-            padding: 15px;
-            text-align: right;
-            font-weight: bold;
-            color: #2d5a27;
-          "
-        >
-          {{ item.subtotal }}€
-        </td>
-        <td style="padding: 15px; text-align: center">
-          <a
-            href="{% url 'remover_do_carrinho' item.cabaz.id %}?action=delete"
-            style="
-              color: #c62828;
-              text-decoration: none;
-              font-size: 0.75rem;
-              font-weight: bold;
-              opacity: 0.6;
-            "
-          >
-            Eliminar
-          </a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-    <tfoot>
+        </tr>
+    {% endfor %}
+</tbody>
+            <tfoot>
+                <tr style="background: #f9f9f9;">
+                    <td colspan="3" style="padding: 20px; text-align: right; font-size: 1.2rem; font-weight: bold;">Total:</td> <td style="padding: 20px; text-align: right; font-size: 1.4rem; font-weight: bold; color: #2d5a27;">
+                        {{ total }}€
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
       <tr style="background: #f9f9f9">
         <td
           colspan="3"
