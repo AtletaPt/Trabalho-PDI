@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 """
 Django settings for campodireto project.
 
@@ -10,7 +13,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -106,7 +108,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Ficheiros de Média (Uploads dos Cabazes)
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Modelo de Utilizador
 AUTH_USER_MODEL = "users.CustomUser"
