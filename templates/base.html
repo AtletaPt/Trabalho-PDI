@@ -89,24 +89,24 @@
         margin: 20px auto 0 auto;
         padding: 0 20px;
       }
-      .alert {
-        padding: 15px 20px;
-        margin-bottom: 10px;
+      .alert-dynamic {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
         border-radius: 10px;
-        font-weight: 600;
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
-      .alert-success {
-        background-color: #e8f5e9;
-        color: #2e7d32;
-        border: 1px solid #c8e6c9;
+      .alert-success-custom {
+        background-color: #dff0d8;
+        border-color: #d6e9c6;
+        color: #3c763d;
       }
-      .alert-error {
+      .alert-error-custom {
         background-color: #ffebee;
+        border-color: #ffcdd2;
         color: #c62828;
-        border: 1px solid #ffcdd2;
       }
 
       .container {
@@ -172,37 +172,24 @@
     </nav>
 
     <div class="messages-container">
-      {% if messages %} {% for message in messages %}
-      <div
-        style="
-          padding: 15px;
-          margin-bottom: 20px;
-          border: 1px solid transparent;
-          border-radius: 10px;
-          background-color: #dff0d8;
-          border-color: #d6e9c6;
-          color: #3c763d;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        "
-      >
-        <span> ✅ {{ message }} </span>
-        <button
-          type="button"
-          onclick="this.parentElement.style.display = 'none'"
-          style="
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #3c763d;
-            font-weight: bold;
-          "
-        >
-          &times;
-        </button>
-      </div>
-      {% endfor %} {% endif %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-dynamic {% if 'error' in message.tags %}alert-error-custom{% else %}alert-success-custom{% endif %}">
+                
+                <span>
+                    {% if 'error' in message.tags %}❌{% else %}✅{% endif %}
+                    {{ message }}
+                </span>
+
+                <button type="button" 
+                        onclick="this.parentElement.style.display='none'" 
+                        style="background: none; border: none; cursor: pointer; color: inherit; font-weight: bold;">
+                    &times;
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
       <script>
         // Procura todos os alertas e faz desaparecer após 5 segundos
         setTimeout(function () {
