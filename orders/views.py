@@ -9,6 +9,13 @@ from cabazes.models import Cabaz
 from .models import Order
 from logistics.models import Zone, Vehicle, Driver
 
+# orders/views.py
+
+from cabazes.models import Cabaz
+# ADICIONA 'OrderItem' aqui à frente de 'Order'
+from .models import Order, OrderItem 
+from logistics.models import Zone, Vehicle, Driver
+
 
 def obter_zona_por_cp(zip_code):
     try:
@@ -338,23 +345,25 @@ def finalizar_carrinho(request):
         zona = Zone.objects.filter(name__iexact=nome_zona).first()
         veiculo = Vehicle.objects.filter(zone=zona).first()
         motorista = Driver.objects.first()
-
-        # 3. Processar itens e criar encomendas
+# 3. Processar itens e criar encomendas
         try:
             for cabaz_id, dados in carrinho.items():
                 if not isinstance(dados, dict):
                     continue
 
                 qtd_encomendada = dados.get("quantidade", 0)
+                # Vamos buscar a lista de produtos que o cliente selecionou/manteve
+                produtos_selecionados = dados.get("produtos", []) 
+                
                 cabaz_obj = Cabaz.objects.get(id=int(cabaz_id))
 
-                # Atualizar Stock de cada produto no cabaz
+                # Atualizar Stock (Aqui mantemos a lógica original do cabaz inteiro)
                 for produto in cabaz_obj.products.all():
                     produto.stock -= qtd_encomendada
                     produto.save()
 
-                # Criar a Encomenda na Base de Dados
-                Order.objects.create(
+                # AQUI ESTÁ A MUDANÇA: Guardamos a encomenda numa variável
+                nova_encomenda = Order.objects.create(
                     customer=request.user,
                     cabaz=cabaz_obj,
                     quantity=qtd_encomendada,
@@ -362,8 +371,16 @@ def finalizar_carrinho(request):
                     zone=zona,
                     vehicle=veiculo,
                     driver=motorista,
+                    zip_code=request.POST.get("zip_code"), # Agora gravamos o CP também
                     status="pendente",
                 )
+
+                # NOVO: Loop para gravar cada produto selecionado na base de dados
+                for nome_produto in produtos_selecionados:
+                    OrderItem.objects.create(
+                        order=nova_encomenda,
+                        product_name=nome_produto
+                    )
 
             # Limpar o carrinho da sessão
             request.session["carrinho"] = {}
@@ -373,10 +390,9 @@ def finalizar_carrinho(request):
             return redirect("/orders/historico/")
 
         except Exception as e:
-            messages.error(request, f"Erro técnico: {str(e)}")
+            messages.error(request, f"Erro técnico ao gravar itens: {str(e)}")
             return redirect("/orders/carrinho/")
-
-    return redirect("/orders/carrinho/")
+        
 
 
 def remover_do_carrinho(request, cabaz_id):

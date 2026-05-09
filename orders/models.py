@@ -12,25 +12,25 @@ ORDER_STATUS = (
     ("cancelada", "Cancelada"),
 )
 
-
 class Order(models.Model):
-
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     cabaz = models.ForeignKey(Cabaz, on_delete=models.CASCADE)
-
     quantity = models.IntegerField(default=1)
-
     order_date = models.DateTimeField(auto_now_add=True)
     delivery_date = models.DateField()
-
     zone = models.ForeignKey(Zone, on_delete=models.SET_NULL, null=True)
-
-    vehicle = models.ForeignKey(
-        Vehicle, on_delete=models.SET_NULL, null=True, blank=True
-    )
+    zip_code = models.CharField(max_length=10, null=True, blank=True) # Adicionado para guardar o CP
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True)
     driver = models.ForeignKey(Driver, on_delete=models.SET_NULL, null=True, blank=True)
-
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default="pendente")
 
     def __str__(self):
         return f"Encomenda {self.id} - {self.customer.username}"
+
+# --- ESTA É A PARTE NOVA QUE DEVES ADICIONAR ---
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    product_name = models.CharField(max_length=100) # Aqui guardamos o nome do produto selecionado
+
+    def __str__(self):
+        return f"{self.product_name} (Enc: {self.order.id})"
