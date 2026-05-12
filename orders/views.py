@@ -9,6 +9,14 @@ from cabazes.models import Cabaz
 from .models import Order, OrderItem
 from logistics.models import Zone, Vehicle, Driver
 
+# orders/views.py
+
+from cabazes.models import Cabaz
+
+# ADICIONA 'OrderItem' aqui à frente de 'Order'
+from .models import Order, OrderItem
+from logistics.models import Zone, Vehicle, Driver
+
 
 def obter_zona_por_cp(zip_code):
     try:
@@ -367,7 +375,6 @@ def finalizar_carrinho(request):
             nova_encomenda.total_price = total_da_encomenda
             nova_encomenda.save()
 
-            # Limpar carrinho
             request.session["carrinho"] = {}
             request.session.modified = True
 
@@ -375,6 +382,7 @@ def finalizar_carrinho(request):
             return redirect("historico_encomendas")
 
         except Exception as e:
+
             messages.error(request, f"Erro ao processar a encomenda: {e}")
             return redirect("ver_carrinho")
 

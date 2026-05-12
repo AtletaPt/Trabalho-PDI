@@ -15,6 +15,7 @@ ORDER_STATUS = (
 
 class Order(models.Model):
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
     # Removemos o campo 'cabaz' daqui, porque ele agora vai para o OrderItem
 
     order_date = models.DateTimeField(auto_now_add=True)
@@ -25,8 +26,8 @@ class Order(models.Model):
     vehicle = models.ForeignKey(
         Vehicle, on_delete=models.SET_NULL, null=True, blank=True
     )
-    driver = models.ForeignKey(Driver, on_delete=models.SET_NULL, null=True, blank=True)
 
+    driver = models.ForeignKey(Driver, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default="pendente")
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
