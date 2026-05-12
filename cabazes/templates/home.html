@@ -1,74 +1,73 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
-<div
-  style="
-    background:
-      linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)),
-      url(&quot;https://images.unsplash.com/photo-1495539406979-bf61750d38ad?q=80&w=2070&auto=format&fit=crop&quot;);
-    background-size: cover;
-    background-position: center;
-    height: 450px;
-    border-radius: 30px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    margin-bottom: 60px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  "
->
-  <img
-    src="{% static 'images/logo.png' %}"
-    style="height: 120px; margin-bottom: 20px"
-  />
-  <h1 style="font-size: 3rem; color: #1a3317; margin: 0">
-    Frescura à sua porta
-  </h1>
-  <p
+<div class="relative overflow-hidden rounded-[40px] shadow-2xl mb-16 group">
+  <div
+    class="absolute inset-0 bg-white/40 z-10 transition-opacity group-hover:bg-white/30"
+  ></div>
+  <div
+    class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
     style="
-      font-size: 1.2rem;
-      color: #2d5a27;
-      font-weight: 500;
-      margin-bottom: 30px;
+      background-image: url(&quot;https://images.unsplash.com/photo-1495539406979-bf61750d38ad?q=80&w=2070&auto=format&fit=crop&quot;);
+      height: 500px;
     "
-  >
-    Cabazes sazonais dos produtores de Coimbra.
-  </p>
+  ></div>
 
-  <a
-    href="/cabazes/"
-    class="btn"
-    style="
-      padding: 15px 30px;
-      background-color: #2d5a27;
-      color: white;
-      text-decoration: none;
-      border-radius: 10px;
-      font-weight: bold;
-    "
-    >Escolher o meu Cabaz</a
+  <div
+    class="relative z-20 h-[500px] flex flex-col justify-center items-center text-center px-6"
   >
+    <img
+      src="{% static 'images/logo.png' %}"
+      alt="Logo"
+      class="h-32 w-auto mb-8 drop-shadow-md"
+    />
+
+    <h1
+      class="text-4xl md:text-6xl font-black text-primary mb-4 tracking-tight"
+    >
+      Frescura à sua porta
+    </h1>
+
+    <p class="text-lg md:text-xl text-secondary font-semibold mb-10 max-w-lg">
+      Cabazes sazonais colhidos hoje pelos produtores de Coimbra.
+    </p>
+
+    <a
+      href="/cabazes/"
+      class="bg-secondary text-white px-10 py-4 rounded-2xl font-black text-lg shadow-xl shadow-green-900/20 hover:bg-primary hover:-translate-y-1 active:scale-95 transition-all"
+    >
+      Escolher o meu Cabaz
+    </a>
+  </div>
 </div>
 
-<div
-  style="
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-    text-align: center;
-  "
->
-  <div>
-    <h3>🌿 Sustentável</h3>
-    <p>Direto do produtor.</p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+  <div
+    class="p-8 bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+  >
+    <div class="text-4xl mb-4">🌿</div>
+    <h3 class="text-xl font-bold text-primary mb-2">Sustentável</h3>
+    <p class="text-gray-500 font-medium">
+      Direto do produtor local para reduzir a pegada de carbono.
+    </p>
   </div>
-  <div>
-    <h3>🚚 Rápido</h3>
-    <p>Entrega em 24h/48h.</p>
+
+  <div
+    class="p-8 bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+  >
+    <div class="text-4xl mb-4">🚚</div>
+    <h3 class="text-xl font-bold text-primary mb-2">Rápido</h3>
+    <p class="text-gray-500 font-medium">
+      Entregas em 24h/48h em toda a região de Coimbra.
+    </p>
   </div>
-  <div>
-    <h3>💰 Justo</h3>
-    <p>Preço sem intermediários.</p>
+
+  <div
+    class="p-8 bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+  >
+    <div class="text-4xl mb-4">💰</div>
+    <h3 class="text-xl font-bold text-primary mb-2">Preço Justo</h3>
+    <p class="text-gray-500 font-medium">
+      Valorização real do trabalho do campo sem intermediários.
+    </p>
   </div>
 </div>
 {% endblock %}

@@ -1,136 +1,109 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block content %}
-<div style="max-width: 1000px; margin: 40px auto; padding: 20px;">
-    
-    <h1 style="color: #1a3317; border-bottom: 2px solid #2d5a27; padding-bottom: 10px; margin-bottom: 30px;">
-        🛒 O Teu Carrinho
-    </h1>
-
-    {% if itens %}
-        <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-            <thead>
-                <tr style="background-color: #2d5a27; color: white; text-align: left;">
-                    <th style="padding: 15px;">Cabaz</th> <th style="padding: 15px; text-align: center;">Quantidade</th>
-                    <th style="padding: 15px; text-align: right;">Preço Unitário</th>
-                    <th style="padding: 15px; text-align: right;">Subtotal</th>
-                    </tr>
-            </thead>
-            <tbody>
-    {% for item in itens %}
-    <tr style="border-bottom: 1px solid #eee;">
-        <td style="padding: 15px; color: #1a3317;">
-            <div style="font-weight: bold; font-size: 1.1rem;">
-                {{ item.cabaz.get_name_display }}
-            </div>
-            <div style="font-size: 0.85rem; color: #666; margin-top: 8px; background: #f9fdf9; padding: 8px; border-radius: 8px; border: 1px solid #edf2ed;">
-                <strong>Inclui:</strong> {{ item.produtos_selecionados|join:", " }}
-            </div>
-        </td>
-        
-        <td style="padding: 15px; text-align: center;">
-            <div style="display: inline-flex; align-items: center; gap: 15px; background: #f8f9f8; padding: 5px 15px; border-radius: 30px; border: 1px solid #eee;">
-                <a href="{% url 'remover_do_carrinho' item.cabaz.id %}" 
-                   style="text-decoration: none; color: #c62828; font-weight: bold; font-size: 1.2rem; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">-</a>
-                
-                <span style="font-weight: bold; font-size: 1.1rem; min-width: 20px;">{{ item.quantidade }}</span>
-                
-                <a href="{% url 'adicionar_ao_carrinho' item.cabaz.id %}" 
-                   style="text-decoration: none; color: #2d5a27; font-weight: bold; font-size: 1.2rem; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">+</a>
-            </div>
-        </td>
-
-        <td style="padding: 15px; text-align: right;">
-            {{ item.cabaz.price }}€
-        </td>
-        <td style="padding: 15px; text-align: right; font-weight: bold; color: #2d5a27;">
-            {{ item.subtotal }}€
-        </td>
-        </tr>
-    {% endfor %}
-</tbody>
-            <tfoot>
-                <tr style="background: #f9f9f9;">
-                    <td colspan="3" style="padding: 20px; text-align: right; font-size: 1.2rem; font-weight: bold;">Total:</td> <td style="padding: 20px; text-align: right; font-size: 1.4rem; font-weight: bold; color: #2d5a27;">
-                        {{ total }}€
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-      <tr style="background: #f9f9f9">
-        <td
-          colspan="3"
-          style="
-            padding: 20px;
-            text-align: right;
-            font-size: 1.2rem;
-            font-weight: bold;
-          "
-        >
-          Total Geral:
-        </td>
-        <td
-          style="
-            padding: 20px;
-            text-align: right;
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #2d5a27;
-          "
-        >
-          {{ total }}€
-        </td>
-        <td></td>
-      </tr>
-    </tfoot>
-  </table>
-
-  <div
-    style="
-      margin-top: 40px;
-      background: #f4f7f4;
-      padding: 30px;
-      border-radius: 20px;
-      border: 1px solid #e0e6e0;
-    "
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="max-w-5xl mx-auto px-4 py-10">
+  <h1
+    class="text-3xl font-bold text-primary border-b-4 border-secondary pb-3 mb-10 flex items-center gap-3"
   >
-    <h2 style="color: #1a3317; margin-top: 0">Dados para Entrega</h2>
-    <p style="font-size: 0.9rem; color: #555; margin-bottom: 20px">
-      * Entregamos apenas em Coimbra às Segundas, Quartas e Sextas.
-    </p>
+    <span>🛒</span> O Teu Carrinho
+  </h1>
 
-    <form method="POST" action="{% url 'finalizar_carrinho' %}">
+  {% if itens %}
+  <div
+    class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10"
+  >
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-secondary text-white">
+          <th class="p-5 font-semibold">Cabaz</th>
+          <th class="p-5 font-semibold text-center">Quantidade</th>
+          <th class="p-5 font-semibold text-right">Preço Unitário</th>
+          <th class="p-5 font-semibold text-right">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for item in itens %}
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="p-5">
+            <div class="font-bold text-gray-800 text-lg mb-2">
+              {{ item.cabaz.get_name_display }}
+            </div>
+
+            <div
+              class="p-3 bg-green-50 border border-green-100 rounded-xl text-sm text-gray-600"
+            >
+              <span class="font-bold text-secondary">Inclui:</span>
+              {% if item.produtos_selecionados %} {{
+              item.produtos_selecionados|join:", " }} {% else %}
+              <span class="italic text-gray-400">Produtos padrão</span>
+              {% endif %}
+            </div>
+          </td>
+
+          <td class="p-5 text-center">
+            <div
+              class="inline-flex items-center gap-4 bg-gray-50 px-4 py-2 rounded-full border border-gray-200"
+            >
+              <a
+                href="{% url 'remover_do_carrinho' item.cabaz.id %}"
+                class="w-8 h-8 flex items-center justify-center bg-white text-red-600 font-bold rounded-full shadow-sm hover:bg-red-50 transition"
+                >−</a
+              >
+              <span class="font-bold text-lg min-w-[20px]"
+                >{{ item.quantidade }}</span
+              >
+              <a
+                href="{% url 'adicionar_ao_carrinho' item.cabaz.id %}"
+                class="w-8 h-8 flex items-center justify-center bg-white text-secondary font-bold rounded-full shadow-sm hover:bg-green-50 transition"
+                >+</a
+              >
+            </div>
+          </td>
+
+          <td class="p-5 text-right text-gray-600">{{ item.cabaz.price }}€</td>
+          <td class="p-5 text-right font-bold text-secondary text-lg">
+            {{ item.subtotal }}€
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="bg-gray-50 border-t-2 border-gray-100">
+        <tr>
+          <td
+            colspan="3"
+            class="p-6 text-right font-bold text-xl text-gray-700"
+          >
+            Total Geral:
+          </td>
+          <td class="p-6 text-right font-black text-2xl text-secondary">
+            {{ total }}€
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="bg-green-50/50 p-8 rounded-3xl border border-green-100">
+    <h2 class="text-2xl font-bold text-primary mb-6">Dados para Entrega</h2>
+    <form
+      method="POST"
+      action="{% url 'finalizar_carrinho' %}"
+      class="space-y-6"
+    >
       {% csrf_token %}
-
-      <div
-        style="
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
-          margin-bottom: 20px;
-        "
-      >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label style="display: block; margin-bottom: 8px; font-weight: bold"
+          <label class="block font-bold text-gray-700 mb-2"
             >Código Postal:</label
           >
           <input
             type="text"
             name="zip_code"
-            placeholder="Ex: 3000-115"
+            placeholder="3000-115"
             required
-            style="
-              width: 100%;
-              padding: 12px;
-              border-radius: 8px;
-              border: 1px solid #ccc;
-            "
+            class="w-full p-4 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-secondary"
           />
         </div>
-
         <div>
-          <label style="display: block; margin-bottom: 8px; font-weight: bold"
+          <label class="block font-bold text-gray-700 mb-2"
             >Data de Entrega:</label
           >
           <input
@@ -138,42 +111,19 @@
             name="delivery_date"
             min="{{ hoje }}"
             required
-            style="
-              width: 100%;
-              padding: 12px;
-              border-radius: 8px;
-              border: 1px solid #ccc;
-            "
+            class="w-full p-4 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-secondary"
           />
         </div>
       </div>
-
       <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-top: 30px;
-        "
+        class="flex flex-col md:flex-row justify-between items-center gap-6 pt-4"
       >
-        <a
-          href="/cabazes/"
-          style="color: #2d5a27; text-decoration: none; font-weight: bold"
+        <a href="/cabazes/" class="text-secondary font-bold hover:underline"
           >← Continuar a Comprar</a
         >
         <button
           type="submit"
-          style="
-            background: #2d5a27;
-            color: white;
-            padding: 15px 40px;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 10px rgba(45, 90, 39, 0.3);
-          "
+          class="w-full md:w-auto bg-secondary text-white px-10 py-4 rounded-2xl font-bold text-lg shadow-lg hover:bg-primary transition-all"
         >
           Finalizar Encomenda
         </button>
@@ -183,32 +133,17 @@
 
   {% else %}
   <div
-    style="
-      text-align: center;
-      padding: 60px 20px;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    "
+    class="text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100"
   >
-    <div style="font-size: 4rem; margin-bottom: 20px">🛒</div>
-    <h2 style="color: #666">O teu carrinho está vazio de momento.</h2>
-    <p style="margin-bottom: 30px; color: #888">
-      Personaliza o teu cabaz com os melhores produtos de Coimbra.
-    </p>
+    <div class="text-7xl mb-6">🛒</div>
+    <h2 class="text-2xl font-bold text-gray-400 mb-8">
+      O teu carrinho está vazio.
+    </h2>
     <a
       href="/cabazes/"
-      style="
-        background: #2d5a27;
-        color: white;
-        padding: 12px 25px;
-        text-decoration: none;
-        border-radius: 8px;
-        font-weight: bold;
-      "
+      class="inline-block bg-secondary text-white px-8 py-3 rounded-xl font-bold"
+      >Ver Cabazes</a
     >
-      Ver Cabazes Disponíveis
-    </a>
   </div>
   {% endif %}
 </div>

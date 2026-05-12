@@ -1,47 +1,98 @@
 {% extends 'base.html' %} {% block content %}
-<div
-  style="
-    max-width: 600px;
-    margin: 0 auto;
-    background: white;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    text-align: center;
-  "
->
-  <div style="font-size: 4rem; color: #4caf50; margin-bottom: 20px">✓</div>
-  <h1 style="margin-bottom: 10px">Encomenda Confirmada!</h1>
-  <p style="color: #666; margin-bottom: 30px">
-    Obrigado por apoiar a produção local de Coimbra.
-  </p>
-
+<div class="max-w-2xl mx-auto px-4 py-12">
   <div
-    style="
-      background: #f9f9f9;
-      padding: 25px;
-      border-radius: 12px;
-      text-align: left;
-      margin-bottom: 30px;
-      border-left: 5px solid var(--primary);
-    "
+    class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 p-8 md:p-12 text-center border border-gray-100"
   >
-    <h3 style="margin-top: 0; color: var(--primary)">📍 Detalhes da Entrega</h3>
-    <p>
-      <strong>Data:</strong> {{ order.delivery_date|date:"d/m/Y" }} ({{
-      order.delivery_date|date:"l" }})
+    <div
+      class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner"
+    >
+      ✓
+    </div>
+
+    <h1 class="text-3xl font-black text-primary mb-3">Encomenda Confirmada!</h1>
+    <p class="text-gray-500 mb-10 leading-relaxed">
+      Obrigado por apoiar a produção local de Coimbra.<br />
+      A sua escolha faz a diferença para os nossos produtores.
     </p>
-    <p><strong>Zona:</strong> {{ order.zone.name }}</p>
-    <p>
-      <strong>Transporte:</strong> {{ order.vehicle.vehicle_type }} ({{
-      order.vehicle.license_plate }})
-    </p>
-    <p><strong>Motorista:</strong> {{ order.driver.name }}</p>
+
+    <div
+      class="bg-gray-50 rounded-2xl p-6 md:p-8 text-left mb-10 border-l-8 border-primary relative overflow-hidden"
+    >
+      <div
+        class="absolute right-[-10px] top-[-10px] text-6xl opacity-5 grayscale"
+      >
+        📍
+      </div>
+
+      <h3 class="text-lg font-bold text-primary mb-4 flex items-center gap-2">
+        <span>📍</span> Detalhes da Entrega
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-6">
+        <div>
+          <span
+            class="block text-xs uppercase tracking-wider text-gray-400 font-bold"
+            >Data Prevista</span
+          >
+          <span class="text-gray-700 font-medium">
+            {{ order.delivery_date|date:"d/m/Y" }}
+            <span class="text-sm text-gray-400"
+              >({{ order.delivery_date|date:"l" }})</span
+            >
+          </span>
+        </div>
+
+        <div>
+          <span
+            class="block text-xs uppercase tracking-wider text-gray-400 font-bold"
+            >Zona de Entrega</span
+          >
+          <span class="text-gray-700 font-medium">{{ order.zone.name }}</span>
+        </div>
+
+        <div>
+          <span
+            class="block text-xs uppercase tracking-wider text-gray-400 font-bold"
+            >Transporte</span
+          >
+          <span class="text-gray-700 font-medium">
+            {{ order.vehicle.name }}
+            <span
+              class="text-[10px] font-mono bg-white px-2 py-0.5 rounded border border-gray-200 ml-1 uppercase"
+            >
+              {{ order.vehicle.license_plate }}
+            </span>
+          </span>
+        </div>
+
+        <div>
+          <span
+            class="block text-xs uppercase tracking-wider text-gray-400 font-bold"
+            >Motorista Responsável</span
+          >
+          <span class="text-gray-700 font-medium">{{ order.driver.name }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a
+        href="/cabazes/"
+        class="px-8 py-3.5 bg-gray-800 text-white rounded-2xl font-bold hover:bg-black transition-all shadow-lg shadow-gray-200"
+      >
+        Voltar à Loja
+      </a>
+      <a
+        href="/orders/historico/"
+        class="px-8 py-3.5 bg-secondary text-white rounded-2xl font-bold hover:bg-primary transition-all shadow-lg shadow-green-900/10"
+      >
+        Ver Minhas Encomendas
+      </a>
+    </div>
   </div>
 
-  <div style="display: flex; gap: 15px; justify-content: center">
-    <a href="/cabazes/" class="btn" style="background: #333">Voltar à Loja</a>
-    <a href="/orders/historico/" class="btn">Ver Minhas Encomendas</a>
-  </div>
+  <p class="text-center mt-8 text-sm text-gray-400">
+    Enviámos um e-mail de confirmação com todos os detalhes.
+  </p>
 </div>
 {% endblock %}

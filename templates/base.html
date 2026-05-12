@@ -4,211 +4,115 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CampoDireto | Coimbra</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        --primary: #2d5a27;
-        --accent: #ff9800;
-        --bg: #f8fbf8;
-      }
-      body {
-        font-family: "Poppins", sans-serif;
-        margin: 0;
-        background: var(--bg);
-        color: #333;
-      }
-
-      nav {
-        background: white;
-        padding: 0.5rem 8%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        border-bottom: 3px solid var(--primary);
-      }
-
-      .brand-container {
-        display: flex;
-        align-items: center;
-        text-decoration: none;
-      }
-
-      /* LOGO AUMENTADO: de 70px para 90px */
-      .logo-img {
-        height: 90px;
-        width: auto;
-        transition: 0.3s;
-      }
-
-      .brand-name {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: var(--primary);
-        margin-left: 15px;
-        letter-spacing: -1px;
-      }
-
-      .nav-links {
-        display: flex;
-        align-items: center;
-      }
-      .nav-links a {
-        color: var(--primary);
-        text-decoration: none;
-        margin-left: 20px;
-        font-weight: 600;
-        font-size: 0.95rem;
-      }
-      .nav-links a:hover {
-        color: var(--accent);
-      }
-
-      .btn-logout {
-        background: none;
-        border: 1px solid #ffcdd2;
-        color: #d32f2f;
-        padding: 6px 15px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-        margin-left: 15px;
-        transition: 0.2s;
-      }
-      .btn-logout:hover {
-        background: #ffebee;
-      }
-
-      /* Estilos para as Mensagens/Alertas */
-      .messages-container {
-        max-width: 1100px;
-        margin: 20px auto 0 auto;
-        padding: 0 20px;
-      }
-      .alert-dynamic {
-        padding: 15px;
-        margin-bottom: 20px;
-        border: 1px solid transparent;
-        border-radius: 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .alert-success-custom {
-        background-color: #dff0d8;
-        border-color: #d6e9c6;
-        color: #3c763d;
-      }
-      .alert-error-custom {
-        background-color: #ffebee;
-        border-color: #ffcdd2;
-        color: #c62828;
-      }
-
-      .container {
-        max-width: 1100px;
-        margin: 20px auto;
-        padding: 20px;
-        min-height: 80vh;
-      }
-      .btn {
-        background: var(--accent);
-        color: white;
-        padding: 10px 22px;
-        border-radius: 8px;
-        text-decoration: none;
-        display: inline-block;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-      }
-      .btn:hover {
-        background: #e68a00;
-        transform: translateY(-1px);
-      }
-
-      footer {
-        text-align: center;
-        padding: 40px;
-        background: white;
-        border-top: 1px solid #eee;
-        margin-top: 50px;
-        color: #888;
-      }
-    </style>
+    <title>CampoDireto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#1a3317",
+              secondary: "#2d5a27",
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body>
-    <nav>
-      <a href="/" class="brand-container">
+  <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+    <nav
+      class="bg-white shadow-md py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50"
+    >
+      <a href="/" class="flex items-center gap-3 no-underline">
         <img
           src="{% static 'images/logo.png' %}"
-          alt="CampoDireto"
-          class="logo-img"
+          alt="Logo"
+          class="h-10 w-auto"
         />
-        <span class="brand-name">CampoDireto</span>
+        <span class="text-primary font-bold text-xl tracking-tight"
+          >CampoDireto</span
+        >
       </a>
 
-      <div class="nav-links">
-        <a href="{% url 'lista_cabazes' %}">Cabazes</a>
+      <div class="flex items-center gap-6">
+        <a
+          href="{% url 'lista_cabazes' %}"
+          class="text-gray-600 hover:text-primary font-medium transition"
+          >Cabazes</a
+        >
 
         {% if user.is_authenticated %}
-        <a href="/orders/historico/">Minhas Encomendas</a>
-        <span style="margin-left: 20px; color: #666; font-size: 0.85rem"
-          >Olá, <strong>{{ user.username }}</strong></span
+        <a
+          href="/orders/historico/"
+          class="text-gray-600 hover:text-primary font-medium transition"
+          >Minhas Encomendas</a
         >
-        <form action="{% url 'logout' %}" method="post" style="display: inline">
+        <span class="hidden md:inline text-gray-400 text-sm border-l pl-6 ml-2">
+          Olá, <span class="font-bold text-gray-700">{{ user.username }}</span>
+        </span>
+        <form action="{% url 'logout' %}" method="post" class="inline">
           {% csrf_token %}
-          <button type="submit" class="btn-logout">Sair</button>
+          <button
+            type="submit"
+            class="text-red-600 hover:text-red-800 text-sm font-semibold ml-2 transition"
+          >
+            Sair
+          </button>
         </form>
         {% else %}
-        <a href="{% url 'login' %}">Entrar</a>
-        <a href="/users/registo/" class="btn">Criar Conta</a>
+        <a
+          href="{% url 'login' %}"
+          class="text-gray-600 hover:text-primary font-medium transition"
+          >Entrar</a
+        >
+        <a
+          href="/users/registo/"
+          class="bg-primary text-white px-5 py-2 rounded-full hover:bg-secondary transition shadow-sm font-medium"
+        >
+          Criar Conta
+        </a>
         {% endif %}
       </div>
     </nav>
 
-    <div class="messages-container">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert-dynamic {% if 'error' in message.tags %}alert-error-custom{% else %}alert-success-custom{% endif %}">
-                
-                <span>
-                    {% if 'error' in message.tags %}❌{% else %}✅{% endif %}
-                    {{ message }}
-                </span>
-
-                <button type="button" 
-                        onclick="this.parentElement.style.display='none'" 
-                        style="background: none; border: none; cursor: pointer; color: inherit; font-weight: bold;">
-                    &times;
-                </button>
-            </div>
-        {% endfor %}
-    {% endif %}
-</div>
-      <script>
-        // Procura todos os alertas e faz desaparecer após 5 segundos
-        setTimeout(function () {
-          let messages = document.querySelectorAll(
-            '[style*="background-color: #dff0d8"]',
-          );
-          messages.forEach((msg) => {
-            msg.style.transition = "opacity 0.5s ease";
-            msg.style.opacity = "0";
-            setTimeout(() => msg.remove(), 500);
-          });
-        }, 5000);
-      </script>
+    <div class="fixed top-20 right-6 z-50 w-full max-w-sm space-y-3">
+      {% if messages %}
+      <div class="fixed top-4 right-4 z-50 space-y-4"></div>
+      {% for message in messages %}
+      <div
+        class="flex items-center p-4 rounded-2xl shadow-lg border bg-white border-green-100 text-green-700"
+      >
+        <span class="mr-3">✅</span>
+        <span>{{ message }}</span>
+        <button
+          onclick="this.parentElement.remove()"
+          class="ml-auto text-gray-400 hover:text-gray-600"
+        >
+          ×
+        </button>
+      </div>
+      {% endfor %} {% endif %}
     </div>
 
-    <div class="container">{% block content %}{% endblock %}</div>
+    <main class="container mx-auto px-6 py-10 flex-grow max-w-6xl">
+      {% block content %}{% endblock %}
+    </main>
 
-    <footer>
-      &copy; 2026 CampoDireto Coimbra - Do produtor para a sua mesa.
+    <footer class="bg-white border-t py-8 text-center text-gray-500 text-sm">
+      &copy; 2026
+      <span class="text-primary font-semibold">CampoDireto Coimbra</span> - Do
+      produtor para a sua mesa.
     </footer>
+
+    <script>
+      setTimeout(function () {
+        const alerts = document.querySelectorAll(".fixed > div");
+        alerts.forEach((msg) => {
+          msg.style.opacity = "0";
+          msg.style.transform = "translateX(20px)";
+          setTimeout(() => msg.remove(), 500);
+        });
+      }, 5000);
+    </script>
   </body>
 </html>

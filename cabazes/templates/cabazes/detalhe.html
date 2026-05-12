@@ -1,52 +1,103 @@
-{% extends 'base.html' %}
-{% block content %}
-<div style="max-width: 900px; margin: 40px auto; padding: 20px; font-family: sans-serif;">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-        
-        <div>
-            {% if cabaz.image %}
-                <img src="{{ cabaz.image.url }}" style="width: 100%; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
-            {% endif %}
-        </div>
-
-        <div>
-            <h1 style="color: #1a3317; margin-bottom: 10px;">{{ cabaz.get_name_display }}</h1>
-            <p style="font-size: 1.2rem; color: #2d5a27; font-weight: bold;">{{ cabaz.price }}€ | {{ cabaz.weight }}kg</p>
-            <p style="color: #555; line-height: 1.6;">{{ cabaz.description }}</p>
-
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 25px 0;">
-
-            <h3 style="color: #1a3317;">Escolha o que incluir:</h3>
-            <p style="font-size: 0.85rem; color: #888;">* Desmarque os itens que não deseja receber.</p>
-
-            <form action="{% url 'adicionar_ao_carrinho' cabaz.id %}" method="POST" id="form-cabaz">
-                {% csrf_token %}
-                <div style="margin-bottom: 25px;">
-                    {% for produto in cabaz.products.all %}
-                    <label style="display: block; padding: 10px; border-bottom: 1px solid #f9f9f9; cursor: pointer;">
-                        <input type="checkbox" name="produtos_escolhidos" value="{{ produto.name }}" checked 
-                               style="margin-right: 10px; accent-color: #2d5a27;">
-                        {{ produto.name }}
-                    </label>
-                    {% endfor %}
-                </div>
-
-                <button type="submit" style="width: 100%; background: #2d5a27; color: white; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">
-                    Adicionar ao Carrinho
-                </button>
-            </form>
-        </div>
+{% extends 'base.html' %} {% block content %}
+<div class="max-w-5xl mx-auto px-4 py-12">
+  <div
+    class="grid grid-cols-1 md:grid-cols-2 gap-12 bg-white p-8 md:p-12 rounded-[40px] shadow-sm border border-gray-100"
+  >
+    <div class="relative">
+      {% if cabaz.image %}
+      <img
+        src="{{ cabaz.image.url }}"
+        alt="{{ cabaz.name }}"
+        class="w-full rounded-[30px] shadow-2xl sticky top-8"
+      />
+      {% endif %}
     </div>
+
+    <div class="flex flex-col">
+      <h1 class="text-4xl font-black text-primary mb-4 leading-tight">
+        {{ cabaz.get_name_display }}
+      </h1>
+
+      <div class="flex items-center gap-4 mb-6">
+        <span class="text-2xl font-black text-secondary"
+          >{{ cabaz.price }}€</span
+        >
+        <span class="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
+        <span class="text-lg font-medium text-gray-500"
+          >{{ cabaz.weight }}kg</span
+        >
+      </div>
+
+      <p class="text-gray-600 leading-relaxed mb-8 text-lg">
+        {{ cabaz.description }}
+      </p>
+
+      <div class="h-px bg-gray-100 w-full mb-8"></div>
+
+      <h3 class="text-xl font-bold text-gray-800 mb-2">
+        Escolha o que incluir:
+      </h3>
+      <p class="text-sm text-gray-400 italic mb-6">
+        * Desmarque os itens que não deseja receber.
+      </p>
+
+      <form
+        action="{% url 'adicionar_ao_carrinho' cabaz.id %}"
+        method="POST"
+        id="form-cabaz"
+        class="space-y-2"
+      >
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 gap-2 mb-8">
+          {% for produto in cabaz.products.all %}
+          <label
+            class="group flex items-center p-4 rounded-2xl border border-gray-100 hover:border-secondary hover:bg-green-50 transition-all cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              name="produtos_escolhidos"
+              value="{{ produto.name }}"
+              checked
+              class="w-6 h-6 rounded-md border-gray-300 text-secondary focus:ring-secondary mr-4 transition-all"
+            />
+            <span
+              class="font-bold text-gray-700 group-hover:text-secondary transition-colors"
+              >{{ produto.name }}</span
+            >
+          </label>
+          {% endfor %}
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-secondary text-white py-5 rounded-2xl font-black text-xl shadow-xl shadow-green-900/20 hover:bg-primary hover:-translate-y-1 active:scale-[0.98] transition-all"
+        >
+          Adicionar ao Carrinho
+        </button>
+      </form>
+
+      <a
+        href="{% url 'lista_cabazes' %}"
+        class="mt-6 text-center text-gray-400 font-medium hover:text-secondary transition-colors"
+      >
+        ← Voltar aos cabazes
+      </a>
+    </div>
+  </div>
 </div>
 
 <script>
-    // Validação para garantir que pelo menos um item está selecionado
-    document.getElementById('form-cabaz').onsubmit = function(e) {
-        const checkboxes = document.querySelectorAll('input[name="produtos_escolhidos"]:checked');
-        if (checkboxes.length === 0) {
-            e.preventDefault();
-            alert("Por favor, selecione pelo menos um item para o seu cabaz!");
-        }
-    };
+  // Validação para garantir que pelo menos um item está selecionado
+  document.getElementById("form-cabaz").onsubmit = function (e) {
+    const checkboxes = document.querySelectorAll(
+      'input[name="produtos_escolhidos"]:checked',
+    );
+    if (checkboxes.length === 0) {
+      e.preventDefault();
+      // Substituído por um alert mais moderno poderia ser bom, mas o nativo funciona bem!
+      alert("Por favor, selecione pelo menos um item para o seu cabaz!");
+    }
+  };
 </script>
 {% endblock %}

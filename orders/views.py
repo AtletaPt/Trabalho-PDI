@@ -6,7 +6,7 @@ from django.db import transaction
 from django.contrib.auth.decorators import login_required
 
 from cabazes.models import Cabaz
-from .models import Order
+from .models import Order, OrderItem
 from logistics.models import Zone, Vehicle, Driver
 
 
@@ -298,85 +298,87 @@ def ver_carrinho(request):
 @login_required
 @transaction.atomic
 def finalizar_carrinho(request):
-    carrinho = request.session.get("carrinho", {})
-
     if request.method == "POST":
-        if not carrinho:
-            return redirect("/cabazes/")
+        carrinho_sessao = request.session.get("carrinho", {})
 
-        delivery_date_str = request.POST.get("delivery_date")
+        if not carrinho_sessao:
+            messages.error(request, "O teu carrinho está vazio.")
+            return redirect("ver_carrinho")
 
-        # 1. Tentar converter a data e validar regras de negócio
+        zip_code_digitado = request.POST.get("zip_code")
+        delivery_date = request.POST.get("delivery_date")
+
+        # --- LOGÍSTICA AUTOMÁTICA ---
+        # 1. Tentar obter o nome da zona através do CP introduzido
+        nome_zona = obter_zona_por_cp(zip_code_digitado)
+
+        zona_atribuida = None
+        veiculo_atribuido = None
+        motorista_atribuido = None
+
+        if nome_zona:
+            # 2. Procurar o objeto Zone na DB que corresponde ao nome retornado pela função
+            zona_atribuida = Zone.objects.filter(name__iexact=nome_zona).first()
+
+            if zona_atribuida:
+                # 3. Procurar o veículo associado a esta zona
+                veiculo_atribuido = Vehicle.objects.filter(zone=zona_atribuida).first()
+
+                # 4. Definir motorista por defeito (podes ajustar esta lógica depois)
+                motorista_atribuido = Driver.objects.first()
+        else:
+            # Se o CP não for válido para as tuas regras, podes dar erro ou deixar passar
+            messages.error(
+                request,
+                f"O Código Postal {zip_code_digitado} não é coberto pelas nossas entregas.",
+            )
+            return redirect("ver_carrinho")
+
         try:
-            delivery_date = datetime.strptime(delivery_date_str, "%Y-%m-%d").date()
+            # 2. Criamos a Encomenda com todos os campos automáticos preenchidos
+            nova_encomenda = Order.objects.create(
+                customer=request.user,
+                delivery_date=delivery_date,
+                zip_code=zip_code_digitado,
+                status="pendente",
+                zone=zona_atribuida,  # Preenchido automaticamente!
+                vehicle=veiculo_atribuido,  # Preenchido automaticamente!
+                driver=motorista_atribuido,  # Preenchido automaticamente!
+            )
 
-            # BLOQUEIO 1: Data no passado
-            if delivery_date < date.today():
-                messages.error(
-                    request, "A data de entrega não pode ser anterior a hoje."
+            total_da_encomenda = 0
+
+            # 3. Criar os Itens (OrderItems)
+            for cabaz_id, dados in carrinho_sessao.items():
+                cabaz = Cabaz.objects.get(id=int(cabaz_id))
+                qtd = dados.get("quantidade", 1)
+                produtos_str = ", ".join(dados.get("produtos", []))
+
+                OrderItem.objects.create(
+                    order=nova_encomenda,
+                    cabaz=cabaz,
+                    quantity=qtd,
+                    price=cabaz.price,
+                    selected_products=produtos_str,
                 )
-                return redirect("/orders/carrinho/")
+                total_da_encomenda += cabaz.price * qtd
 
-            # BLOQUEIO 2: Apenas Segunda (0), Quarta (2) e Sexta (4)
-            if delivery_date.weekday() not in [0, 2, 4]:
-                messages.error(
-                    request,
-                    "Entregamos apenas às Segundas, Quartas e Sextas em Coimbra.",
-                )
-                return redirect("/orders/carrinho/")
+            # Atualizamos o preço total
+            nova_encomenda.total_price = total_da_encomenda
+            nova_encomenda.save()
 
-        except ValueError:
-            messages.error(request, "Data de entrega inválida.")
-            return redirect("/orders/carrinho/")
-
-        # 2. Validar Zona de Entrega
-        nome_zona = obter_zona_por_cp(request.POST.get("zip_code"))
-        if not nome_zona:
-            messages.error(request, "Infelizmente ainda não chegamos a essa morada.")
-            return redirect("/orders/carrinho/")
-
-        zona = Zone.objects.filter(name__iexact=nome_zona).first()
-        veiculo = Vehicle.objects.filter(zone=zona).first()
-        motorista = Driver.objects.first()
-
-        # 3. Processar itens e criar encomendas
-        try:
-            for cabaz_id, dados in carrinho.items():
-                if not isinstance(dados, dict):
-                    continue
-
-                qtd_encomendada = dados.get("quantidade", 0)
-                cabaz_obj = Cabaz.objects.get(id=int(cabaz_id))
-
-                # Atualizar Stock de cada produto no cabaz
-                for produto in cabaz_obj.products.all():
-                    produto.stock -= qtd_encomendada
-                    produto.save()
-
-                # Criar a Encomenda na Base de Dados
-                Order.objects.create(
-                    customer=request.user,
-                    cabaz=cabaz_obj,
-                    quantity=qtd_encomendada,
-                    delivery_date=delivery_date,
-                    zone=zona,
-                    vehicle=veiculo,
-                    driver=motorista,
-                    status="pendente",
-                )
-
-            # Limpar o carrinho da sessão
+            # Limpar carrinho
             request.session["carrinho"] = {}
             request.session.modified = True
 
-            messages.success(request, "Encomenda finalizada com sucesso!")
-            return redirect("/orders/historico/")
+            messages.success(request, "Encomenda realizada com sucesso!")
+            return redirect("historico_encomendas")
 
         except Exception as e:
-            messages.error(request, f"Erro técnico: {str(e)}")
-            return redirect("/orders/carrinho/")
+            messages.error(request, f"Erro ao processar a encomenda: {e}")
+            return redirect("ver_carrinho")
 
-    return redirect("/orders/carrinho/")
+    return redirect("ver_carrinho")
 
 
 def remover_do_carrinho(request, cabaz_id):

@@ -1,62 +1,62 @@
 {% extends 'base.html' %} {% block content %}
-<div style="max-width: 800px; margin: 0 auto">
-  <div style="text-align: center; margin-bottom: 40px">
-    <h1 style="color: #1a3317">Finalizar a sua Encomenda</h1>
-    <p style="color: #666">
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="text-center mb-10">
+    <h1 class="text-3xl font-bold text-primary mb-2">
+      Finalizar a sua Encomenda
+    </h1>
+    <p class="text-gray-500">
       Confirme os detalhes de entrega para o
-      <strong>{{ cabaz.get_name_display }}</strong>.
+      <span class="font-bold text-secondary">{{ cabaz.get_name_display }}</span
+      >.
     </p>
   </div>
 
   <div
-    style="
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-      background: white;
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    "
+    class="grid grid-cols-1 md:grid-cols-2 gap-10 bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-gray-100"
   >
-    <div style="border-right: 1px solid #eee; padding-right: 40px">
-      <h3 style="color: #2d5a27; margin-top: 0">Resumo</h3>
+    <div class="md:border-r border-gray-100 md:pr-10">
+      <h3 class="text-xl font-bold text-secondary mb-6">Resumo do Pedido</h3>
+
       {% if cabaz.image %}
-      <img
-        src="{{ cabaz.image.url }}"
-        style="
-          width: 100%;
-          height: 200px;
-          object-fit: cover;
-          border-radius: 12px;
-          margin-bottom: 20px;
-        "
-      />
+      <div class="mb-6 overflow-hidden rounded-2xl shadow-sm">
+        <img
+          src="{{ cabaz.image.url }}"
+          alt="{{ cabaz.name }}"
+          class="w-full h-48 object-cover hover:scale-105 transition duration-500"
+        />
+      </div>
       {% endif %}
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 10px;
-        "
-      >
-        <span>Preço Unitário:</span>
-        <strong>{{ cabaz.price }}€</strong>
+
+      <div class="space-y-4">
+        <div class="flex justify-between items-center text-gray-600">
+          <span>Preço Unitário:</span>
+          <span class="font-bold text-gray-800 text-lg"
+            >{{ cabaz.price }}€</span
+          >
+        </div>
+        <div class="flex justify-between items-center text-gray-600">
+          <span>Peso Aproximado:</span>
+          <span class="font-bold text-gray-800">{{ cabaz.weight }}kg</span>
+        </div>
+
+        <div
+          class="pt-4 border-t border-gray-50 text-sm text-gray-500 leading-relaxed italic"
+        >
+          {{ cabaz.description }}
+        </div>
       </div>
-      <div style="display: flex; justify-content: space-between">
-        <span>Peso Aprox:</span>
-        <strong>{{ cabaz.weight }}kg</strong>
-      </div>
-      <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0" />
-      <p style="font-size: 0.9rem; color: #777">{{ cabaz.description }}</p>
     </div>
 
     <div>
-      <form method="POST" action="{% url 'confirmar_encomenda' cabaz.id %}">
+      <form
+        method="POST"
+        action="{% url 'confirmar_encomenda' cabaz.id %}"
+        class="space-y-6"
+      >
         {% csrf_token %}
 
-        <div style="margin-bottom: 20px">
-          <label style="display: block; margin-bottom: 8px; font-weight: 600"
+        <div class="space-y-2">
+          <label class="block text-sm font-bold text-gray-700 ml-1"
             >Quantidade de Cabazes</label
           >
           <input
@@ -64,17 +64,12 @@
             name="quantity"
             value="1"
             min="1"
-            style="
-              width: 100%;
-              padding: 12px;
-              border: 1px solid #ddd;
-              border-radius: 8px;
-            "
+            class="w-full p-3.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition bg-gray-50"
           />
         </div>
 
-        <div style="margin-bottom: 20px">
-          <label style="display: block; margin-bottom: 8px; font-weight: 600"
+        <div class="space-y-2">
+          <label class="block text-sm font-bold text-gray-700 ml-1"
             >Data de Entrega</label
           >
           <input
@@ -82,18 +77,15 @@
             name="delivery_date"
             min="{{ hoje|date:'Y-m-d' }}"
             required
-            style="
-              width: 100%;
-              padding: 12px;
-              border: 1px solid #ddd;
-              border-radius: 8px;
-            "
+            class="w-full p-3.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition bg-gray-50 text-gray-700"
           />
-          <small style="color: #888">Entregas às 2ª, 4ª e 6ª feiras.</small>
+          <p class="text-xs text-gray-400 mt-1 italic pl-1">
+            Entregas disponíveis às 2ª, 4ª e 6ª feiras.
+          </p>
         </div>
 
-        <div style="margin-bottom: 30px">
-          <label style="display: block; margin-bottom: 8px; font-weight: 600"
+        <div class="space-y-2">
+          <label class="block text-sm font-bold text-gray-700 ml-1"
             >Código Postal (Coimbra)</label
           >
           <input
@@ -101,22 +93,26 @@
             name="zip_code"
             placeholder="3000-000"
             required
-            style="
-              width: 100%;
-              padding: 12px;
-              border: 1px solid #ddd;
-              border-radius: 8px;
-            "
+            class="w-full p-3.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition bg-gray-50"
           />
         </div>
 
-        <button
-          type="submit"
-          class="btn"
-          style="width: 100%; font-size: 1.1rem"
-        >
-          Confirmar e Pagar
-        </button>
+        <div class="pt-4">
+          <button
+            type="submit"
+            class="w-full bg-secondary text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-green-900/20 hover:bg-primary hover:-translate-y-1 active:scale-95 transition-all"
+          >
+            Confirmar e Pagar
+          </button>
+          <p class="text-center mt-4">
+            <a
+              href="{% url 'lista_cabazes' %}"
+              class="text-sm text-gray-400 hover:text-secondary transition font-medium"
+            >
+              Cancelar e voltar
+            </a>
+          </p>
+        </div>
       </form>
     </div>
   </div>
