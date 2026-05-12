@@ -75,18 +75,20 @@
       </div>
     </nav>
 
-    <div class="fixed top-20 right-6 z-50 w-full max-w-sm space-y-3">
-      {% if messages %}
-      <div class="fixed top-4 right-4 z-50 space-y-4"></div>
-      {% for message in messages %}
+    <div class="fixed top-6 right-6 z-[100] w-full max-w-sm space-y-3">
+      {% if messages %} {% for message in messages %}
       <div
-        class="flex items-center p-4 rounded-2xl shadow-lg border bg-white border-green-100 text-green-700"
+        class="flex items-center p-4 rounded-2xl shadow-2xl border animate-bounce-in {% if message.tags == 'error' %} bg-red-50 border-red-200 text-red-800 {% else %} bg-white border-green-100 text-green-700 {% endif %}"
       >
-        <span class="mr-3">✅</span>
-        <span>{{ message }}</span>
+        <span class="mr-3 text-lg">
+          {% if message.tags == 'error' %} ❌ {% else %} ✅ {% endif %}
+        </span>
+
+        <span class="font-medium text-sm"> {{ message|safe }} </span>
+
         <button
           onclick="this.parentElement.remove()"
-          class="ml-auto text-gray-400 hover:text-gray-600"
+          class="ml-auto opacity-50 hover:opacity-100 font-bold text-xl leading-none"
         >
           ×
         </button>

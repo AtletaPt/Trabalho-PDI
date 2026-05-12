@@ -18,121 +18,6 @@ from .models import Order, OrderItem
 from logistics.models import Zone, Vehicle, Driver
 
 
-def obter_zona_por_cp(zip_code):
-    try:
-        prefixo, sufixo = zip_code.split("-")
-        sufixo = int(sufixo)
-    except:
-        return None
-
-    # 1. Santo António dos Olivais e Celas
-    if prefixo == "3000":
-        if (
-            sufixo == 5
-            or (25 <= sufixo <= 46)
-            or sufixo == 48
-            or sufixo == 101
-            or sufixo == 119
-            or (291 <= sufixo <= 293)
-            or sufixo == 299
-            or sufixo == 304
-            or sufixo == 313
-            or sufixo == 353
-            or (375 <= sufixo <= 377)
-            or (458 <= sufixo <= 459)
-            or sufixo == 538
-            or sufixo == 540
-            or (542 <= sufixo <= 543)
-        ):
-            return "Santo António dos Olivais e Celas"
-    elif prefixo == "3020":
-        if (
-            sufixo == 134
-            or (163 <= sufixo <= 165)
-            or (238 <= sufixo <= 239)
-            or sufixo == 246
-            or (249 <= sufixo <= 250)
-            or sufixo == 255
-            or (368 <= sufixo <= 369)
-            or sufixo == 371
-            or sufixo == 385
-            or (476 <= sufixo <= 489)
-        ):
-            return "Santo António dos Olivais e Celas"
-    elif prefixo == "3030":
-        if (
-            sufixo in [461, 464, 468, 471, 473]
-            or (477 <= sufixo <= 491)
-            or sufixo == 493
-            or (775 <= sufixo <= 776)
-        ):
-            return "Santo António dos Olivais e Celas"
-
-    # 2. Coimbra Centro (Baixa e Sé)
-    if prefixo == "3000":
-        if (
-            (20 <= sufixo <= 34)
-            or (97 <= sufixo <= 104)
-            or (114 <= sufixo <= 116)
-            or (120 <= sufixo <= 122)
-            or (282 <= sufixo <= 290)
-            or (294 <= sufixo <= 312)
-            or (315 <= sufixo <= 317)
-            or sufixo == 351
-            or (355 <= sufixo <= 363)
-            or (365 <= sufixo <= 366)
-            or sufixo in [368, 370]
-            or (372 <= sufixo <= 374)
-            or sufixo == 470
-            or (472 <= sufixo <= 473)
-            or (475 <= sufixo <= 476)
-            or sufixo in [481, 484]
-            or (486 <= sufixo <= 487)
-            or (489 <= sufixo <= 492)
-            or sufixo == 494
-            or sufixo == 503
-            or (507 <= sufixo <= 509)
-            or sufixo == 511
-            or (515 <= sufixo <= 516)
-            or sufixo == 520
-            or (522 <= sufixo <= 525)
-        ):
-            return "Coimbra Centro (Baixa e Sé)"
-
-    # 3. Solum e Vale das Flores
-    if prefixo == "3030":
-        if sufixo == 450 or (452 <= sufixo <= 459):
-            return "Solum e Vale das Flores"
-
-    # 4. Eiras e São Paulo de Frades
-    if prefixo == "3000" and (106 <= sufixo <= 113):
-        return "Eiras e São Paulo de Frades"
-    elif prefixo == "3020":
-        if (
-            (130 <= sufixo <= 133)
-            or (135 <= sufixo <= 136)
-            or sufixo == 154
-            or sufixo == 164
-            or (166 <= sufixo <= 171)
-            or sufixo in [239, 240, 248, 251, 308, 384, 438, 458, 478, 497]
-            or (242 <= sufixo <= 244)
-            or (253 <= sufixo <= 254)
-            or (322 <= sufixo <= 324)
-            or (422 <= sufixo <= 424)
-            or (428 <= sufixo <= 430)
-            or (461 <= sufixo <= 462)
-            or (499 <= sufixo <= 500)
-        ):
-            return "Eiras e São Paulo de Frades"
-
-    # 5. São Martinho e Santa Clara
-    if prefixo == "3045":
-        if (1 <= sufixo <= 199) or (300 <= sufixo <= 999):
-            return "São Martinho e Santa Clara"
-
-    return None
-
-
 def pagina_encomenda(request, cabaz_id):
     cabaz = get_object_or_404(Cabaz, id=cabaz_id)
     hoje = timezone.now().date()
@@ -147,9 +32,12 @@ def confirmar_encomenda(request, cabaz_id):
         customer = request.user
         quantity_ordered = int(request.POST.get("quantity", 1))
         delivery_date_str = request.POST.get("delivery_date")
-        zip_code = request.POST.get("zip_code", "")
 
-        # 1. VALIDAÇÕES DE DATA E CP
+        # NOVOS CAMPOS vindos do formulário
+        zona_id = request.POST.get("zone_id")
+        morada_detalhada = request.POST.get("address_detail")
+
+        # 1. VALIDAÇÃO DE DATA
         try:
             delivery_date = datetime.strptime(delivery_date_str, "%Y-%m-%d").date()
         except (ValueError, TypeError):
@@ -165,18 +53,10 @@ def confirmar_encomenda(request, cabaz_id):
             messages.error(request, "Entregas apenas à Segunda, Quarta e Sexta.")
             return redirect("pagina_encomenda", cabaz_id=cabaz.id)
 
-        nome_zona = obter_zona_por_cp(zip_code)
-        if not nome_zona:
-            messages.error(
-                request,
-                f"O Código Postal {zip_code} não é coberto pelas nossas entregas em Coimbra.",
-            )
-            return redirect("pagina_encomenda", cabaz_id=cabaz.id)
-
         # 2. LOGÍSTICA E STOCK COM TRANSAÇÃO
         try:
             with transaction.atomic():
-                # Verificação de Stock
+                # Verificação de Stock (Mantemos a tua lógica)
                 for item in cabaz.items.all():
                     necessario = item.quantity * quantity_ordered
                     if item.product.stock < necessario:
@@ -185,22 +65,33 @@ def confirmar_encomenda(request, cabaz_id):
                         )
                         return redirect("pagina_encomenda", cabaz_id=cabaz.id)
 
-                # Atribuição Logística
-                zona_atribuida = Zone.objects.filter(name__iexact=nome_zona).first()
+                # Atribuição Logística Baseada no ID da Zona (Nova Lógica)
+                zona_atribuida = get_object_or_404(Zone, id=zona_id)
                 veiculo_atribuido = Vehicle.objects.filter(zone=zona_atribuida).first()
                 motorista_atribuido = Driver.objects.first()
 
-                # Criar Encomenda
+                # Criar Encomenda (Utilizando address_detail e total_price)
                 nova_encomenda = Order.objects.create(
                     customer=customer,
-                    cabaz=cabaz,
-                    quantity=quantity_ordered,
                     delivery_date=delivery_date,
+                    address_detail=morada_detalhada,  # Agora gravamos a morada exata
                     status="pendente",
                     zone=zona_atribuida,
                     vehicle=veiculo_atribuido,
                     driver=motorista_atribuido,
-                    zip_code=zip_code,
+                    total_price=cabaz.price * quantity_ordered,
+                )
+
+                # Criar o Item da Encomenda (OrderItem)
+                # Como é compra direta, os produtos selecionados são os originais do cabaz
+                OrderItem.objects.create(
+                    order=nova_encomenda,
+                    cabaz=cabaz,
+                    quantity=quantity_ordered,
+                    price=cabaz.price,
+                    selected_products=", ".join(
+                        [item.product.name for item in cabaz.items.all()]
+                    ),
                 )
 
                 # Baixa de Stock
@@ -216,7 +107,18 @@ def confirmar_encomenda(request, cabaz_id):
             messages.error(request, f"Erro ao processar encomenda: {str(e)}")
             return redirect("pagina_encomenda", cabaz_id=cabaz.id)
 
-    return redirect("pagina_encomenda", cabaz_id=cabaz_id)
+    # Se o método for GET (quando a página carrega pela primeira vez)
+    # Precisas de enviar as zonas para o template poder mostrar o menu select
+    zonas = Zone.objects.all()
+    return render(
+        request,
+        "orders/confirmar_encomenda.html",
+        {
+            "cabaz": cabaz,
+            "zonas": zonas,
+            "hoje": timezone.now().date().strftime("%Y-%m-%d"),
+        },
+    )
 
 
 @login_required
@@ -270,12 +172,10 @@ def ver_carrinho(request):
     total_geral = 0
 
     for cabaz_id, dados in carrinho_sessao.items():
-        # Proteção contra dados antigos: se não for um dicionário, ignora este item
         if not isinstance(dados, dict):
             continue
 
         cabaz = get_object_or_404(Cabaz, id=int(cabaz_id))
-
         qtd = dados.get("quantidade", 0)
         produtos = dados.get("produtos", [])
 
@@ -287,9 +187,12 @@ def ver_carrinho(request):
                 "cabaz": cabaz,
                 "quantidade": qtd,
                 "subtotal": subtotal,
-                "produtos_selecionados": produtos,
+                "produtos_selecionados": produtos,  # Passa a lista de produtos
             }
         )
+
+    # NOVIDADE: Buscar as zonas para o menu de seleção
+    zonas = Zone.objects.all()
 
     return render(
         request,
@@ -297,7 +200,7 @@ def ver_carrinho(request):
         {
             "itens": itens_display,
             "total": total_geral,
-            # Usamos date.today() formatado para que o 'min' do HTML funcione 100%
+            "zonas": zonas,  # ADICIONADO AQUI
             "hoje": date.today().strftime("%Y-%m-%d"),
         },
     )
@@ -307,82 +210,80 @@ def ver_carrinho(request):
 @transaction.atomic
 def finalizar_carrinho(request):
     if request.method == "POST":
-        carrinho_sessao = request.session.get("carrinho", {})
+        # 1. Capturar dados do formulário
+        zona_id = request.POST.get("zone_id")
+        morada_detalhada = request.POST.get("address_detail")
+        data_str = request.POST.get("delivery_date")
 
+        # 2. Validar se o carrinho existe
+        carrinho_sessao = request.session.get("carrinho", {})
         if not carrinho_sessao:
             messages.error(request, "O teu carrinho está vazio.")
             return redirect("ver_carrinho")
 
-        zip_code_digitado = request.POST.get("zip_code")
-        delivery_date = request.POST.get("delivery_date")
-
-        # --- LOGÍSTICA AUTOMÁTICA ---
-        # 1. Tentar obter o nome da zona através do CP introduzido
-        nome_zona = obter_zona_por_cp(zip_code_digitado)
-
-        zona_atribuida = None
-        veiculo_atribuido = None
-        motorista_atribuido = None
-
-        if nome_zona:
-            # 2. Procurar o objeto Zone na DB que corresponde ao nome retornado pela função
-            zona_atribuida = Zone.objects.filter(name__iexact=nome_zona).first()
-
-            if zona_atribuida:
-                # 3. Procurar o veículo associado a esta zona
-                veiculo_atribuido = Vehicle.objects.filter(zone=zona_atribuida).first()
-
-                # 4. Definir motorista por defeito (podes ajustar esta lógica depois)
-                motorista_atribuido = Driver.objects.first()
-        else:
-            # Se o CP não for válido para as tuas regras, podes dar erro ou deixar passar
-            messages.error(
-                request,
-                f"O Código Postal {zip_code_digitado} não é coberto pelas nossas entregas.",
-            )
-            return redirect("ver_carrinho")
-
         try:
-            # 2. Criamos a Encomenda com todos os campos automáticos preenchidos
-            nova_encomenda = Order.objects.create(
-                customer=request.user,
-                delivery_date=delivery_date,
-                zip_code=zip_code_digitado,
-                status="pendente",
-                zone=zona_atribuida,  # Preenchido automaticamente!
-                vehicle=veiculo_atribuido,  # Preenchido automaticamente!
-                driver=motorista_atribuido,  # Preenchido automaticamente!
-            )
-
-            total_da_encomenda = 0
-
-            # 3. Criar os Itens (OrderItems)
-            for cabaz_id, dados in carrinho_sessao.items():
-                cabaz = Cabaz.objects.get(id=int(cabaz_id))
-                qtd = dados.get("quantidade", 1)
-                produtos_str = ", ".join(dados.get("produtos", []))
-
-                OrderItem.objects.create(
-                    order=nova_encomenda,
-                    cabaz=cabaz,
-                    quantity=qtd,
-                    price=cabaz.price,
-                    selected_products=produtos_str,
+            # 3. Validar a Data (Seg, Qua, Sex)
+            data_entrega = datetime.strptime(data_str, "%Y-%m-%d").date()
+            if data_entrega.weekday() not in [0, 2, 4]:
+                messages.error(
+                    request,
+                    "Data inválida. Entregamos apenas às Segundas, Quartas e Sextas.",
                 )
-                total_da_encomenda += cabaz.price * qtd
+                return redirect("ver_carrinho")
 
-            # Atualizamos o preço total
-            nova_encomenda.total_price = total_da_encomenda
-            nova_encomenda.save()
+            # 4. Obter a Zona e Logística (Dinamismo Total)
+            # Se o utilizador escolheu uma zona, vamos buscar o objeto Zone
+            zona_atribuida = get_object_or_404(Zone, id=zona_id)
 
-            request.session["carrinho"] = {}
-            request.session.modified = True
+            # Procurar o veículo associado a esta zona
+            veiculo_atribuido = Vehicle.objects.filter(zone=zona_atribuida).first()
 
-            messages.success(request, "Encomenda realizada com sucesso!")
-            return redirect("historico_encomendas")
+            motorista_atribuido = Driver.objects.first()
+
+            # 5. Criar a Encomenda
+            with transaction.atomic():  # Garante que nada é criado se houver erro a meio
+                nova_encomenda = Order.objects.create(
+                    customer=request.user,
+                    delivery_date=data_entrega,
+                    address_detail=morada_detalhada,  # Novo campo no modelo
+                    status="pendente",
+                    zone=zona_atribuida,
+                    vehicle=veiculo_atribuido,
+                    driver=motorista_atribuido,
+                )
+
+                total_da_encomenda = 0
+
+                # 6. Criar os Itens (OrderItems)
+                for cabaz_id, dados in carrinho_sessao.items():
+                    cabaz = Cabaz.objects.get(id=int(cabaz_id))
+                    qtd = dados.get("quantidade", 1)
+
+                    # CORREÇÃO: Tratar a lista de produtos selecionados
+                    produtos_lista = dados.get("produtos", [])
+                    produtos_str = ", ".join(produtos_lista)
+
+                    OrderItem.objects.create(
+                        order=nova_encomenda,
+                        cabaz=cabaz,
+                        quantity=qtd,
+                        price=cabaz.price,
+                        selected_products=produtos_str,
+                    )
+                    total_da_encomenda += cabaz.price * qtd
+
+                # Atualizar preço final
+                nova_encomenda.total_price = total_da_encomenda
+                nova_encomenda.save()
+
+                # 7. Limpar Carrinho
+                request.session["carrinho"] = {}
+                request.session.modified = True
+
+                messages.success(request, "Encomenda realizada com sucesso!")
+                return redirect("historico_encomendas")
 
         except Exception as e:
-
             messages.error(request, f"Erro ao processar a encomenda: {e}")
             return redirect("ver_carrinho")
 

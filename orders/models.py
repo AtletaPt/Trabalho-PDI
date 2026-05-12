@@ -20,6 +20,9 @@ class Order(models.Model):
 
     order_date = models.DateTimeField(auto_now_add=True)
     delivery_date = models.DateField()
+    address_detail = models.CharField(
+        max_length=255, verbose_name="Morada (Rua, Nº, Andar) "
+    )
     zip_code = models.CharField(max_length=10, blank=True, null=True)
 
     zone = models.ForeignKey(Zone, on_delete=models.SET_NULL, null=True)
