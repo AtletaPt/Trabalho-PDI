@@ -1,19 +1,21 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
+
+# Importa o teu novo formulário personalizado
+from .forms import CustomUserCreationForm
 
 
 def registo_view(request):
-    # Verifica se o utilizador foi redirecionado porque tentou aceder a algo restrito
+    # Verifica se o utilizador foi redirecionado
     if "next" in request.GET and not request.user.is_authenticated:
-        # Usamos messages.error para que apareça a vermelho conforme o teu base.html
         messages.error(
             request,
             "Para finalizar a encomenda, deve ter uma conta. Por favor, crie uma conta ou faça login.",
         )
 
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        # USAR O FORMULÁRIO PERSONALIZADO AQUI
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get("username")
@@ -22,6 +24,7 @@ def registo_view(request):
             )
             return redirect("login")
     else:
-        form = UserCreationForm()
+        # E AQUI TAMBÉM
+        form = CustomUserCreationForm()
 
     return render(request, "users/registo.html", {"form": form})

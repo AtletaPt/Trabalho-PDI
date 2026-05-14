@@ -1,76 +1,95 @@
 {% extends 'base.html' %} {% block content %}
-<div
-  style="
-    max-width: 450px;
-    margin: 40px auto;
-    background: white;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-    text-align: center;
-    border: 1px solid #eee;
-  "
->
-  <h2 style="color: #1a3317; margin-bottom: 10px">Criar Conta</h2>
-  <p style="color: #666; margin-bottom: 30px">
-    Junte-se à comunidade CampoDireto
-  </p>
-
-  <form method="post">
-    {% csrf_token %}
-
-    <style>
-      form p {
-        text-align: left;
-        margin-bottom: 15px;
-      }
-      form input {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 1rem;
-        box-sizing: border-box;
-        display: block;
-        margin-top: 5px;
-      }
-      .helptext {
-        font-size: 0.8rem;
-        color: #888;
-        display: block;
-        margin-top: 5px;
-      }
-      ul {
-        font-size: 0.8rem;
-        color: #888;
-        text-align: left;
-        padding-left: 20px;
-      }
-    </style>
-
-    {{ form.as_p }}
-
-    <button
-      type="submit"
-      class="btn"
-      style="width: 100%; padding: 14px; font-size: 1.1rem; margin-top: 20px"
-    >
-      Registar
-    </button>
-  </form>
-
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-12">
   <div
-    style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #f0f0f0"
+    class="max-w-md w-full bg-white p-10 rounded-[20px] shadow-2xl shadow-black/5 border border-gray-100 text-center"
   >
-    <p style="color: #777; font-size: 0.9rem">
-      Já tem uma conta? <br />
-      <a
-        href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}"
-        style="color: var(--primary); font-weight: 700; text-decoration: none"
-      >
-        Faça Login aqui
-      </a>
+    <h2 class="text-3xl font-bold text-primary mb-2">Criar Conta</h2>
+    <p class="text-gray-500 mb-8 font-medium">
+      Junte-se à comunidade CampoDireto
     </p>
+
+    <form method="post" class="space-y-4 text-left">
+      {% csrf_token %}
+
+      <style>
+        form p {
+          margin-bottom: 1rem; /* mb-4 */
+        }
+
+        form label {
+          display: block; /* block */
+          font-weight: 700; /* font-bold */
+          color: #374151; /* text-gray-700 */
+          margin-bottom: 0.25rem; /* mb-1 */
+          margin-left: 0.25rem; /* ml-1 */
+          font-size: 0.875rem; /* text-sm */
+        }
+
+        form input {
+          width: 100%; /* w-full */
+          padding: 0.75rem; /* p-3 */
+          border-radius: 0.75rem; /* rounded-xl */
+          border: 1px solid #e5e7eb; /* border-gray-200 */
+          outline: none;
+          transition: all 0.2s; /* transition-all */
+          background-color: rgba(249, 250, 251, 0.5); /* bg-gray-50/50 */
+        }
+
+        form input:focus {
+          border-color: var(
+            --secondary,
+            #10b981
+          ); /* Substitui pela tua cor secundária */
+          box-shadow: 0 0 0 2px var(--secondary, #10b981); /* focus:ring-2 */
+        }
+
+        .helptext {
+          display: block;
+          font-size: 0.75rem;
+          color: #9ca3af;
+          margin-top: 0.25rem;
+          margin-left: 0.25rem;
+        }
+
+        form ul {
+          font-size: 0.75rem;
+          color: #9ca3af;
+          list-style-type: disc;
+          padding-left: 1.25rem;
+          margin-top: 0.5rem;
+        }
+
+        .errorlist {
+          color: #ef4444;
+          font-size: 0.75rem;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+          list-style: none;
+          padding-left: 0;
+        }
+      </style>
+
+      {{ form.as_p }}
+
+      <button
+        type="submit"
+        class="w-full bg-secondary hover:bg-primary text-white font-bold py-4 rounded-2xl text-lg shadow-lg shadow-secondary/20 transition-all transform hover:-translate-y-0.5 active:scale-95 mt-6"
+      >
+        Registar Conta
+      </button>
+    </form>
+
+    <div class="mt-8 pt-6 border-t border-gray-100">
+      <p class="text-gray-500 text-sm">
+        Já tem uma conta? <br />
+        <a
+          href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}"
+          class="text-secondary font-bold hover:text-primary transition-colors inline-block mt-2"
+        >
+          Faça Login aqui
+        </a>
+      </p>
+    </div>
   </div>
 </div>
 {% endblock %}
