@@ -47,7 +47,9 @@
             class="block text-xs uppercase tracking-wider text-gray-400 font-bold"
             >Zona de Entrega</span
           >
-          <span class="text-gray-700 font-medium">{{ order.zone.name }}</span>
+          <span class="text-gray-700 font-medium"
+            >{{ order.zone.name|default:"Coimbra" }}</span
+          >
         </div>
 
         <div>
@@ -56,12 +58,7 @@
             >Transporte</span
           >
           <span class="text-gray-700 font-medium">
-            {{ order.vehicle.name }}
-            <span
-              class="text-[10px] font-mono bg-white px-2 py-0.5 rounded border border-gray-200 ml-1 uppercase"
-            >
-              {{ order.vehicle.license_plate }}
-            </span>
+            {{ order.vehicle.name|default:"Carrinha CampoDireto" }}
           </span>
         </div>
 
@@ -70,29 +67,27 @@
             class="block text-xs uppercase tracking-wider text-gray-400 font-bold"
             >Motorista Responsável</span
           >
-          <span class="text-gray-700 font-medium">{{ order.driver.name }}</span>
+          <span class="text-gray-700 font-medium"
+            >{{ order.driver.name|default:"Equipa Local" }}</span
+          >
         </div>
       </div>
     </div>
 
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
       <a
-        href="/cabazes/"
-        class="px-8 py-3.5 bg-gray-800 text-white rounded-2xl font-bold hover:bg-black transition-all shadow-lg shadow-gray-200"
+        href="/"
+        class="px-8 py-3.5 bg-gray-800 text-white rounded-2xl font-bold hover:bg-black transition-all"
       >
         Voltar à Loja
       </a>
       <a
         href="/orders/historico/"
-        class="px-8 py-3.5 bg-secondary text-white rounded-2xl font-bold hover:bg-primary transition-all shadow-lg shadow-green-900/10"
+        class="px-8 py-3.5 bg-secondary text-white rounded-2xl font-bold hover:bg-primary transition-all"
       >
         Ver Minhas Encomendas
       </a>
     </div>
   </div>
-
-  <p class="text-center mt-8 text-sm text-gray-400">
-    Enviámos um e-mail de confirmação com todos os detalhes.
-  </p>
 </div>
 {% endblock %}

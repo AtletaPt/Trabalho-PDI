@@ -137,6 +137,7 @@
 </div>
 
 <script>
+  // Validação de dias da semana
   document
     .getElementById("delivery_date")
     .addEventListener("input", function (e) {
@@ -146,6 +147,14 @@
         this.value = "";
       }
     });
+
+  // Impedir múltiplos cliques no botão para não baralhar o Django
+  document.querySelector("form").addEventListener("submit", function () {
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.innerText = "A processar...";
+    btn.classList.add("opacity-50", "cursor-not-allowed");
+  });
 </script>
 
 {% endblock %}

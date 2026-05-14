@@ -32,8 +32,6 @@ def confirmar_encomenda(request, cabaz_id):
         customer = request.user
         quantity_ordered = int(request.POST.get("quantity", 1))
         delivery_date_str = request.POST.get("delivery_date")
-
-        # NOVOS CAMPOS vindos do formulário
         zona_id = request.POST.get("zone_id")
         morada_detalhada = request.POST.get("address_detail")
 
@@ -56,7 +54,7 @@ def confirmar_encomenda(request, cabaz_id):
         # 2. LOGÍSTICA E STOCK COM TRANSAÇÃO
         try:
             with transaction.atomic():
-                # Verificação de Stock (Mantemos a tua lógica)
+                # Verificação de Stock
                 for item in cabaz.items.all():
                     necessario = item.quantity * quantity_ordered
                     if item.product.stock < necessario:
@@ -65,16 +63,16 @@ def confirmar_encomenda(request, cabaz_id):
                         )
                         return redirect("pagina_encomenda", cabaz_id=cabaz.id)
 
-                # Atribuição Logística Baseada no ID da Zona (Nova Lógica)
+                # Atribuição Logística
                 zona_atribuida = get_object_or_404(Zone, id=zona_id)
                 veiculo_atribuido = Vehicle.objects.filter(zone=zona_atribuida).first()
                 motorista_atribuido = Driver.objects.first()
 
-                # Criar Encomenda (Utilizando address_detail e total_price)
+                # Criar Encomenda
                 nova_encomenda = Order.objects.create(
                     customer=customer,
                     delivery_date=delivery_date,
-                    address_detail=morada_detalhada,  # Agora gravamos a morada exata
+                    address_detail=morada_detalhada,
                     status="pendente",
                     zone=zona_atribuida,
                     vehicle=veiculo_atribuido,
@@ -82,8 +80,7 @@ def confirmar_encomenda(request, cabaz_id):
                     total_price=cabaz.price * quantity_ordered,
                 )
 
-                # Criar o Item da Encomenda (OrderItem)
-                # Como é compra direta, os produtos selecionados são os originais do cabaz
+                # Criar o Item da Encomenda
                 OrderItem.objects.create(
                     order=nova_encomenda,
                     cabaz=cabaz,
@@ -100,15 +97,15 @@ def confirmar_encomenda(request, cabaz_id):
                     item.product.stock -= necessario
                     item.product.save()
 
-            messages.success(request, "Encomenda confirmada com sucesso!")
             return render(request, "orders/sucesso.html", {"order": nova_encomenda})
 
         except Exception as e:
-            messages.error(request, f"Erro ao processar encomenda: {str(e)}")
+            # ESTA LINHA É CRUCIAL: Vai dizer-te no terminal por que falhou
+            print(f"ERRO AO GERAR SUCESSO: {e}")
+            messages.error(request, f"Erro: {str(e)}")
             return redirect("pagina_encomenda", cabaz_id=cabaz.id)
 
-    # Se o método for GET (quando a página carrega pela primeira vez)
-    # Precisas de enviar as zonas para o template poder mostrar o menu select
+    # Caso GET
     zonas = Zone.objects.all()
     return render(
         request,
@@ -276,12 +273,10 @@ def finalizar_carrinho(request):
                 nova_encomenda.total_price = total_da_encomenda
                 nova_encomenda.save()
 
-                # 7. Limpar Carrinho
                 request.session["carrinho"] = {}
                 request.session.modified = True
 
-                messages.success(request, "Encomenda realizada com sucesso!")
-                return redirect("historico_encomendas")
+                return render(request, "orders/sucesso.html", {"order": nova_encomenda})
 
         except Exception as e:
             messages.error(request, f"Erro ao processar a encomenda: {e}")
