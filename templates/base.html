@@ -66,7 +66,7 @@
           >Entrar</a
         >
         <a
-          href="/users/registo/"
+          href="{% url 'registo' %}"
           class="bg-primary text-white px-5 py-2 rounded-full hover:bg-secondary transition shadow-sm font-medium"
         >
           Criar Conta
@@ -78,11 +78,9 @@
     <div class="fixed top-6 right-6 z-[100] w-full max-w-sm space-y-3">
       {% if messages %} {% for message in messages %}
       <div
-        class="flex items-center p-4 rounded-2xl shadow-2xl border animate-bounce-in {% if message.tags == 'error' %} bg-red-50 border-red-200 text-red-800 {% else %} bg-white border-green-100 text-green-700 {% endif %}"
+        class="flex items-center p-4 rounded-2xl shadow-2xl border transition-all duration-300 {% if message.tags == 'error' or message.tags == 'warning' %} bg-red-50 border-red-200 text-red-800 {% else %} bg-white border-green-100 text-green-700 {% endif %}"
       >
-        <span class="mr-3 text-lg">
-          {% if message.tags == 'error' %} ❌ {% else %} ✅ {% endif %}
-        </span>
+        <span class="mr-3 text-lg">⚠️</span>
 
         <span class="font-medium text-sm"> {{ message|safe }} </span>
 

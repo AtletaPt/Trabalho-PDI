@@ -125,6 +125,11 @@ def historico_encomendas(request):
 
 
 def adicionar_ao_carrinho(request, cabaz_id):
+    if not request.user.is_authenticated:
+        messages.warning(
+            request, "Precisa de iniciar sessão para adicionar produtos ao carrinho! 🔑"
+        )
+        return redirect("login")
     if "carrinho" not in request.session:
         request.session["carrinho"] = {}
 
