@@ -17,7 +17,7 @@ class Cabaz(models.Model):
     image = models.ImageField(upload_to="cabazes_images/", blank=True, null=True)
     products = models.ManyToManyField(Product, blank=True)
 
-    # --- NOVA PROPRIEDADE DINÂMICA ---
+    # --- PROPRIEDADE DINÂMICA ---
     @property
     def stock(self):
         """

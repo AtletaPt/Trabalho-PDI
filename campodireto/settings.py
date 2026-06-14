@@ -75,9 +75,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# Internationalization
 LANGUAGE_CODE = "pt-pt"
-TIME_ZONE = "Europe/Lisbon"  # Atualizado para o horário de Portugal
+TIME_ZONE = "Europe/Lisbon"
 USE_I18N = True
 USE_TZ = True
 
@@ -85,7 +84,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-# Ficheiros de Média (Uploads dos Cabazes)
+# Ficheiros de media (Uploads dos Cabazes)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 

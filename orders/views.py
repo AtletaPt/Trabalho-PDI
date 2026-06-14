@@ -100,7 +100,7 @@ def confirmar_encomenda(request, cabaz_id):
             return render(request, "orders/sucesso.html", {"order": nova_encomenda})
 
         except Exception as e:
-            # ESTA LINHA É CRUCIAL: Vai dizer-te no terminal por que falhou
+            # Vai dizer-te no terminal por que falhou
             print(f"ERRO AO GERAR SUCESSO: {e}")
             messages.error(request, f"Erro: {str(e)}")
             return redirect("pagina_encomenda", cabaz_id=cabaz.id)
@@ -127,7 +127,7 @@ def historico_encomendas(request):
 def adicionar_ao_carrinho(request, cabaz_id):
     if not request.user.is_authenticated:
         messages.warning(
-            request, "Precisa de iniciar sessão para adicionar produtos ao carrinho! 🔑"
+            request, "Precisa de iniciar sessão para adicionar produtos ao carrinho!"
         )
         return redirect("login")
     if "carrinho" not in request.session:
@@ -145,23 +145,17 @@ def adicionar_ao_carrinho(request, cabaz_id):
             messages.error(request, "Tens de selecionar pelo menos um produto!")
             return redirect("detalhe_cabaz", cabaz_id=cabaz_id)
 
-        # Guardamos no carrinho um dicionário em vez de apenas a quantidade
-        # Assim guardamos a quantidade E a lista de produtos para este item
         if id_str in carrinho:
             carrinho[id_str]["quantidade"] += 1
-            # Opcional: atualizar os produtos escolhidos ou manter os anteriores
             carrinho[id_str]["produtos"] = produtos_escolhidos
         else:
             carrinho[id_str] = {"quantidade": 1, "produtos": produtos_escolhidos}
 
         messages.success(request, "Cabaz adicionado ao carrinho!")
     else:
-        # Se for um GET simples (ex: botão + no carrinho), apenas aumenta a quantidade
         if id_str in carrinho:
             carrinho[id_str]["quantidade"] += 1
         else:
-            # Caso alguém tente adicionar sem passar pelo detalhe,
-            # podes redirecionar para o detalhe para ele escolher
             return redirect("detalhe_cabaz", cabaz_id=cabaz_id)
 
     request.session.modified = True
@@ -189,11 +183,10 @@ def ver_carrinho(request):
                 "cabaz": cabaz,
                 "quantidade": qtd,
                 "subtotal": subtotal,
-                "produtos_selecionados": produtos,  # Passa a lista de produtos
+                "produtos_selecionados": produtos,
             }
         )
 
-    # NOVIDADE: Buscar as zonas para o menu de seleção
     zonas = Zone.objects.all()
 
     return render(
@@ -202,7 +195,7 @@ def ver_carrinho(request):
         {
             "itens": itens_display,
             "total": total_geral,
-            "zonas": zonas,  # ADICIONADO AQUI
+            "zonas": zonas,
             "hoje": date.today().strftime("%Y-%m-%d"),
         },
     )
@@ -239,8 +232,7 @@ def finalizar_carrinho(request):
                 qtd = dados.get("quantidade", 1)
                 total_da_encomenda += cabaz.price * qtd
 
-            # 5. GUARDAR NA SESSÃO: Em vez de criar a encomenda na BD agora,
-            # guardamos os dados do formulário para usar após o pagamento.
+            # 5. GUARDAR NA SESSÃO: Em vez de criar a encomenda na BD agora, guardamos os dados do formulário para usar após o pagamento.
             request.session["dados_encomenda_pendente"] = {
                 "zone_id": zona_id,
                 "address_detail": morada_detalhada,
@@ -284,7 +276,7 @@ def pagamento_sucesso_ajax(request):
                     status=400,
                 )
 
-            # Obter a Logística (Igual à tua lógica antiga)
+            # Obter a Logística
             zona_atribuida = get_object_or_404(Zone, id=dados_encomenda["zone_id"])
             veiculo_atribuido = Vehicle.objects.filter(zone=zona_atribuida).first()
             motorista_atribuido = Driver.objects.first()
@@ -297,7 +289,7 @@ def pagamento_sucesso_ajax(request):
                 customer=request.user,
                 delivery_date=data_entrega,
                 address_detail=dados_encomenda["address_detail"],
-                status="pago",  # Define logo como pago!
+                status="pago",
                 zone=zona_atribuida,
                 vehicle=veiculo_atribuido,
                 driver=motorista_atribuido,

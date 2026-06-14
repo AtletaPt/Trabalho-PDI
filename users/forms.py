@@ -9,6 +9,4 @@ User = get_user_model()
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
-        # Define aqui os campos que queres que apareçam no formulário de registo
-        # Normalmente o username e o email são o básico
         fields = ("username", "email")

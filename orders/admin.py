@@ -5,7 +5,7 @@ from .models import Order, OrderItem
 # 1. Configuração para os produtos aparecerem dentro da página da Encomenda
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    extra = 0  # Impede que apareçam linhas vazias extras
+    extra = 0
     readonly_fields = (
         "cabaz",
         "quantity",
