@@ -9,13 +9,13 @@ from cabazes.models import Cabaz
 from .models import Order, OrderItem
 from logistics.models import Zone, Vehicle, Driver
 
-# orders/views.py
-
 from cabazes.models import Cabaz
 
-# ADICIONA 'OrderItem' aqui à frente de 'Order'
 from .models import Order, OrderItem
 from logistics.models import Zone, Vehicle, Driver
+
+import json
+from django.http import JsonResponse
 
 
 def pagina_encomenda(request, cabaz_id):
@@ -204,7 +204,6 @@ def ver_carrinho(request):
 
 
 @login_required
-@transaction.atomic
 def finalizar_carrinho(request):
     if request.method == "POST":
         # 1. Capturar dados do formulário
@@ -228,61 +227,135 @@ def finalizar_carrinho(request):
                 )
                 return redirect("ver_carrinho")
 
-            # 4. Obter a Zona e Logística (Dinamismo Total)
-            # Se o utilizador escolheu uma zona, vamos buscar o objeto Zone
-            zona_atribuida = get_object_or_404(Zone, id=zona_id)
+            # 4. Calcular o preço total antecipadamente para o PayPal
+            total_da_encomenda = 0
+            for cabaz_id, dados in carrinho_sessao.items():
+                cabaz = Cabaz.objects.get(id=int(cabaz_id))
+                qtd = dados.get("quantidade", 1)
+                total_da_encomenda += cabaz.price * qtd
 
-            # Procurar o veículo associado a esta zona
-            veiculo_atribuido = Vehicle.objects.filter(zone=zona_atribuida).first()
+            # 5. GUARDAR NA SESSÃO: Em vez de criar a encomenda na BD agora,
+            # guardamos os dados do formulário para usar após o pagamento.
+            request.session["dados_encomenda_pendente"] = {
+                "zone_id": zona_id,
+                "address_detail": morada_detalhada,
+                "delivery_date": data_str,
+                "total": float(total_da_encomenda),
+            }
+            request.session.modified = True
 
-            motorista_atribuido = Driver.objects.first()
-
-            # 5. Criar a Encomenda
-            with transaction.atomic():  # Garante que nada é criado se houver erro a meio
-                nova_encomenda = Order.objects.create(
-                    customer=request.user,
-                    delivery_date=data_entrega,
-                    address_detail=morada_detalhada,  # Novo campo no modelo
-                    status="pendente",
-                    zone=zona_atribuida,
-                    vehicle=veiculo_atribuido,
-                    driver=motorista_atribuido,
-                )
-
-                total_da_encomenda = 0
-
-                # 6. Criar os Itens (OrderItems)
-                for cabaz_id, dados in carrinho_sessao.items():
-                    cabaz = Cabaz.objects.get(id=int(cabaz_id))
-                    qtd = dados.get("quantidade", 1)
-
-                    # CORREÇÃO: Tratar a lista de produtos selecionados
-                    produtos_lista = dados.get("produtos", [])
-                    produtos_str = ", ".join(produtos_lista)
-
-                    OrderItem.objects.create(
-                        order=nova_encomenda,
-                        cabaz=cabaz,
-                        quantity=qtd,
-                        price=cabaz.price,
-                        selected_products=produtos_str,
-                    )
-                    total_da_encomenda += cabaz.price * qtd
-
-                # Atualizar preço final
-                nova_encomenda.total_price = total_da_encomenda
-                nova_encomenda.save()
-
-                request.session["carrinho"] = {}
-                request.session.modified = True
-
-                return render(request, "orders/sucesso.html", {"order": nova_encomenda})
+            # 6. Redirecionar para a página intermédia com o botão do PayPal
+            return render(
+                request,
+                "orders/pagamentos_paypal.html",
+                {"total": total_da_encomenda, "morada": morada_detalhada},
+            )
 
         except Exception as e:
-            messages.error(request, f"Erro ao processar a encomenda: {e}")
+            messages.error(request, f"Erro ao processar os dados do formulário: {e}")
             return redirect("ver_carrinho")
 
     return redirect("ver_carrinho")
+
+
+@login_required
+@transaction.atomic
+def pagamento_sucesso_ajax(request):
+    """
+    Esta função é chamada via JavaScript (fetch) assim que o PayPal
+    aprova o pagamento na Sandbox. Ela cria a encomenda real na BD.
+    """
+    if request.method == "POST":
+        try:
+            dados_ajax = json.loads(request.body)
+
+            # Recuperar os dados guardados na sessão
+            dados_encomenda = request.session.get("dados_encomenda_pendente")
+            carrinho_sessao = request.session.get("carrinho", {})
+
+            if not dados_encomenda or not carrinho_sessao:
+                return JsonResponse(
+                    {"status": "erro", "message": "Os dados da sessão expiraram."},
+                    status=400,
+                )
+
+            # Obter a Logística (Igual à tua lógica antiga)
+            zona_atribuida = get_object_or_404(Zone, id=dados_encomenda["zone_id"])
+            veiculo_atribuido = Vehicle.objects.filter(zone=zona_atribuida).first()
+            motorista_atribuido = Driver.objects.first()
+            data_entrega = datetime.strptime(
+                dados_encomenda["delivery_date"], "%Y-%m-%d"
+            ).date()
+
+            # Criar a Encomenda Oficial
+            nova_encomenda = Order.objects.create(
+                customer=request.user,
+                delivery_date=data_entrega,
+                address_detail=dados_encomenda["address_detail"],
+                status="pago",  # Define logo como pago!
+                zone=zona_atribuida,
+                vehicle=veiculo_atribuido,
+                driver=motorista_atribuido,
+            )
+
+            total_da_encomenda = 0
+
+            # Criar os Itens (OrderItems)
+            for cabaz_id, dados in carrinho_sessao.items():
+                cabaz = Cabaz.objects.get(id=int(cabaz_id))
+                qtd = dados.get("quantidade", 1)
+                produtos_lista = dados.get("produtos", [])
+                produtos_str = ", ".join(produtos_lista)
+
+                OrderItem.objects.create(
+                    order=nova_encomenda,
+                    cabaz=cabaz,
+                    quantity=qtd,
+                    price=cabaz.price,
+                    selected_products=produtos_str,
+                )
+                total_da_encomenda += cabaz.price * qtd
+
+            # Atualizar preço final e gravar
+            nova_encomenda.total_price = total_da_encomenda
+            nova_encomenda.save()
+
+            # Limpar Carrinho e dados pendentes da sessão
+            request.session["carrinho"] = {}
+            if "dados_encomenda_pendente" in request.session:
+                del request.session["dados_encomenda_pendente"]
+
+            # Guardamos o ID para que a view 'ordem_sucesso' saiba que encomenda mostrar
+            request.session["ultima_encomenda_id"] = nova_encomenda.id
+            request.session.modified = True
+
+            # Retorna o sinal verde para o JavaScript saber para onde redirecionar o browser
+            return JsonResponse(
+                {"status": "sucesso", "redirect_url": "/orders/sucesso/"}
+            )
+
+        except Exception as e:
+            return JsonResponse({"status": "erro", "message": str(e)}, status=500)
+
+    return JsonResponse(
+        {"status": "erro", "message": "Método não permitido"}, status=405
+    )
+
+
+@login_required
+def ordem_sucesso(request):
+    """
+    Passo 3: Aterragem final do utilizador. Mostra os detalhes da entrega
+    e o check verde. Protegido para só mostrar se houver uma compra recente.
+    """
+    encomenda_id = request.session.get("ultima_encomenda_id")
+
+    if not encomenda_id:
+        return redirect("home")
+
+    encomenda = get_object_or_404(Order, id=encomenda_id, customer=request.user)
+
+    return render(request, "orders/sucesso.html", {"order": encomenda})
 
 
 def remover_do_carrinho(request, cabaz_id):

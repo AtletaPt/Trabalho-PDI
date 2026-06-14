@@ -1,0 +1,77 @@
+{% extends 'base.html' %} {% block content %}
+<div class="max-w-md mx-auto px-4 py-12 text-center">
+  <div class="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
+    <div
+      class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner"
+    >
+      💳
+    </div>
+    <h2 class="text-2xl font-black text-primary mb-2">Falta pouco!</h2>
+    <p class="text-gray-500 mb-6">
+      Confirme o pagamento do seu cabaz para finalizar o pedido.
+    </p>
+
+    <div
+      class="bg-gray-50 p-4 rounded-2xl mb-6 text-left border border-gray-100"
+    >
+      <div class="flex justify-between font-bold text-gray-700 text-lg">
+        <span>Total a Pagar:</span>
+        <span class="text-secondary">{{ total }}€</span>
+      </div>
+      <p class="text-xs text-gray-400 mt-2">Envio para: {{ morada }}</p>
+    </div>
+
+    <div id="paypal-button-container"></div>
+  </div>
+</div>
+
+<script src="https://www.paypal.com/sdk/js?client-id=ASnBlewuqeA1Y46lhk1E9SS92vM5Dy7_OGIqiRNUIHNug4tue0O39J_z2vB9vSEDhTX64vTk3WH67Uev&currency=EUR"></script>
+
+<script>
+  // Passamos o valor do Django para o JS limpando qualquer formatação estranha
+  const totalEncomenda = parseFloat("{{ total }}".replace(",", "."));
+
+  paypal
+    .Buttons({
+      createOrder: function (data, actions) {
+        return actions.order.create({
+          purchase_units: [
+            {
+              amount: {
+                value: totalEncomenda.toFixed(2),
+              },
+            },
+          ],
+        });
+      },
+      onApprove: function (data, actions) {
+        return actions.order.capture().then(function (details) {
+          // Comunicação AJAX com o Django
+          fetch("{% url 'pagamento_sucesso_ajax' %}", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}",
+            },
+            body: JSON.stringify({
+              orderID: data.orderID,
+              status: details.status,
+            }),
+          })
+            .then((response) => response.json())
+            .then((resData) => {
+              if (resData.status === "sucesso") {
+                window.location.href = resData.redirect_url;
+              } else {
+                alert("Erro no servidor: " + resData.message);
+              }
+            })
+            .catch((err) => {
+              alert("Erro na requisição: " + err);
+            });
+        });
+      },
+    })
+    .render("#paypal-button-container");
+</script>
+{% endblock %}

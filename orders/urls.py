@@ -16,10 +16,16 @@ urlpatterns = [
         name="adicionar_ao_carrinho",
     ),
     path("carrinho/finalizar/", views.finalizar_carrinho, name="finalizar_carrinho"),
-    # NOVA URL AQUI:
     path(
         "carrinho/remover/<int:cabaz_id>/",
         views.remover_do_carrinho,
         name="remover_do_carrinho",
     ),
+    path("finalizar/", views.finalizar_carrinho, name="finalizar_carrinho"),
+    path(
+        "pagamento-sucesso-ajax/",
+        views.pagamento_sucesso_ajax,
+        name="pagamento_sucesso_ajax",
+    ),
+    path("sucesso/", views.ordem_sucesso, name="ordem_sucesso"),
 ]

@@ -29,20 +29,33 @@
         <img
           src="{{ cabaz.image.url }}"
           alt="{{ cabaz.name }}"
-          class="w-full h-full object-cover"
+          class="w-full h-full object-cover transition duration-500 {% if cabaz.stock == 0 %}opacity-40 grayscale{% endif %}"
         />
         {% else %}
         <div
-          class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400"
+          class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400 {% if cabaz.stock == 0 %}opacity-40{% endif %}"
         >
           Sem imagem
         </div>
         {% endif %}
+
         <div
           class="absolute top-4 right-4 bg-white/90 backdrop-blur px-4 py-1 rounded-full font-bold text-secondary shadow-sm"
         >
           {{ cabaz.weight }}kg
         </div>
+
+        {% if cabaz.stock == 0 %}
+        <div
+          class="absolute inset-0 flex items-center justify-center bg-black/10 backdrop-blur-[1px]"
+        >
+          <span
+            class="bg-red-600 text-white text-xs md:text-sm font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg border border-red-500 animate-pulse"
+          >
+            Esgotado
+          </span>
+        </div>
+        {% endif %}
       </div>
 
       <div class="p-8 flex flex-col flex-grow">
@@ -60,12 +73,21 @@
             {{ cabaz.price }}€
           </div>
 
+          {% if cabaz.stock == 0 %}
+          <button
+            disabled
+            class="block w-full text-center bg-gray-200 text-gray-400 py-4 rounded-2xl font-bold cursor-not-allowed"
+          >
+            Indisponível
+          </button>
+          {% else %}
           <a
             href="{% url 'detalhe_cabaz' cabaz.id %}"
             class="block w-full text-center bg-secondary text-white py-4 rounded-2xl font-bold hover:bg-primary transition-colors shadow-lg shadow-green-900/10"
           >
             Ver Opções e Comprar
           </a>
+          {% endif %}
         </div>
       </div>
     </div>
